@@ -41,6 +41,11 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 		this(r, InvalidReplyCodeHandler.FAIL, CompactRowPolicy.DEFAULT);
 	}
 
+	public SearchResultHandler(SearchResultCollector r, SAXParserFactory factory) {
+		this(r);
+		FACTORY = factory;
+	}
+
 	public SearchResultHandler(SearchResultCollector r, InvalidReplyCodeHandler invalidReplyCodeHandler, CompactRowPolicy badRowPolicy) {
 		this.compactRowPolicy = badRowPolicy;
 		if (r == null)

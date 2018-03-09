@@ -14,6 +14,8 @@ import org.realtors.rets.common.metadata.MetadataBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.xml.parsers.SAXParserFactory;
+
 
 /**
  * Implements the basic transport mechanism.  This class deals with the
@@ -232,9 +234,9 @@ public class RetsTransport {
 	 * @param req the search request
 	 * @param collector the result object that will store the data
 	 */
-	public void search(SearchRequest req, SearchResultCollector collector) throws RetsException {
+	public void search(SearchRequest req, SearchResultCollector collector, SAXParserFactory factory) throws RetsException {
 		RetsHttpResponse httpResponse = doRequest(req);
-		new SearchResultHandler(collector).parse(httpResponse.getInputStream(), httpResponse.getCharset());
+		new SearchResultHandler(collector, factory).parse(httpResponse.getInputStream(), httpResponse.getCharset());
 	}
 
 	/**

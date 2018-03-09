@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import org.realtors.rets.common.metadata.Metadata;
 import org.realtors.rets.common.metadata.MetadataException;
 
+import javax.xml.parsers.SAXParserFactory;
+
 /**
  * RetsSession is the core class of the rets.client package.
  */
@@ -315,9 +317,9 @@ public class RetsSession {
 	 * @return a completed SearchResult
 	 * @exception RetsException if an error occurs
 	 */
-	public SearchResult search(SearchRequest req) throws RetsException {
+	public SearchResult search(SearchRequest req, SAXParserFactory factory) throws RetsException {
 		SearchResultImpl res = new SearchResultImpl();
-		search(req, res);
+		search(req, res, factory);
 		return res;
 	}
 
@@ -331,8 +333,8 @@ public class RetsSession {
 	 * search invocation.
 	 * @exception RetsException if an error occurs
 	 */
-	public void search(SearchRequest req, SearchResultCollector collector) throws RetsException {
-		this.transport.search(req, collector);
+	public void search(SearchRequest req, SearchResultCollector collector, SAXParserFactory factory) throws RetsException {
+		this.transport.search(req, collector, factory);
 	}
 
 	/**
@@ -380,9 +382,9 @@ public class RetsSession {
 	 * @return the number of records that returned from the search request
 	 * @throws RetsException
 	 */
-	public int getQueryCount(SearchRequest req) throws RetsException {
+	public int getQueryCount(SearchRequest req, SAXParserFactory factory) throws RetsException {
 		req.setCountOnly();
-		SearchResult res = this.search(req);
+		SearchResult res = this.search(req, factory);
 		return res.getCount();
 	}
 
