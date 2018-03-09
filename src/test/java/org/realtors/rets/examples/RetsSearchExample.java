@@ -11,6 +11,8 @@ import org.realtors.rets.client.RetsVersion;
 import org.realtors.rets.client.SearchRequest;
 import org.realtors.rets.client.SearchResultImpl;
 
+import javax.xml.parsers.SAXParserFactory;
+
 /**
  * Simple Example performing a search and iterating over the results
  *
@@ -56,7 +58,7 @@ public class RetsSearchExample {
 		SearchResultImpl response;
 		try {
 			//Execute the search
-			response= (SearchResultImpl) session.search(request);
+			response= (SearchResultImpl) session.search(request, SAXParserFactory.newInstance());
 
 			//Print out count and columns
 			int count = response.getCount();
