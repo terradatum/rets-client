@@ -1,15 +1,17 @@
 package org.realtors.rets.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.exception.NestableRuntimeException;
 
-/** Random utility functions. */
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+/**
+ * Random utility functions.
+ */
 public class RetsUtil {
 	public static void copyStream(InputStream in, OutputStream out) throws IOException {
 		byte[] buf = new byte[512];

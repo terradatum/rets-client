@@ -83,7 +83,7 @@ public class LoginResponseTest extends RetsTestCase {
 		LoginResponse response = new LoginResponse();
 		response.setStrict(true);
 		try {
-			response.parse(getResource("login_lower_case.xml"), RetsVersion.RETS_15);
+			response.parse(getResource("login_lower_case.xml"), RetsVersion.v1_5);
 			fail("Should throw exception");
 		} catch (RetsException e) {
 			// Expected

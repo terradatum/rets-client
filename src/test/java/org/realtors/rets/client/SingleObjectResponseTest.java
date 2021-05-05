@@ -17,7 +17,7 @@ public class SingleObjectResponseTest extends TestCase {
 		super.tearDown();
 	}
 
-	public void testCaseInsensitiveHeaders() throws Exception {
+	public void testCaseInsensitiveHeaders() {
 		Map headers = new HashMap();
 		headers.put("Content-type", "1");
 		headers.put("location", "2");

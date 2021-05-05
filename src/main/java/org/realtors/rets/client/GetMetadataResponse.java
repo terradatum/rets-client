@@ -1,22 +1,21 @@
 package org.realtors.rets.client;
 
+import org.apache.commons.lang.math.NumberUtils;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.realtors.rets.metadata.JDomCompactBuilder;
+import org.realtors.rets.metadata.JDomStandardBuilder;
+import org.realtors.rets.metadata.MetadataException;
+import org.realtors.rets.metadata.MetadataObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.commons.lang.math.NumberUtils;
-
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.realtors.rets.common.metadata.MetaObject;
-import org.realtors.rets.common.metadata.JDomCompactBuilder;
-import org.realtors.rets.common.metadata.MetadataException;
-import org.realtors.rets.common.metadata.JDomStandardBuilder;
-
 public class GetMetadataResponse {
-	private MetaObject[] mMetadataObjs;
+	private MetadataObject[] mMetadataObjs;
 
 	public GetMetadataResponse(InputStream stream, boolean compact, boolean isStrict) throws RetsException {
 		try {
@@ -41,9 +40,7 @@ public class GetMetadataResponse {
 				e.setRemoteMessage(retsElement.getAttributeValue(retsElement.getAttributeValue("ReplyText")));
 				throw e;
 			}
-		} catch (JDOMException e) {
-			throw new RetsException(e);
-		} catch (IOException e) {
+		} catch (JDOMException | IOException e) {
 			throw new RetsException(e);
 		}
 	}
@@ -53,7 +50,7 @@ public class GetMetadataResponse {
 		if (children.size() != 0) {
 			throw new RetsException("Expecting 0 children when results");
 		}
-		this.mMetadataObjs = new MetaObject[0];
+		this.mMetadataObjs = new MetadataObject[0];
 	}
 
 	private void handleCompactMetadata(Document document, boolean isStrict) throws RetsException {
@@ -76,7 +73,7 @@ public class GetMetadataResponse {
 		}
 	}
 
-	public MetaObject[] getMetadata() {
+	public MetadataObject[] getMetadata() {
 		return this.mMetadataObjs;
 	}
 

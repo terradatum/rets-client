@@ -1,13 +1,11 @@
 package org.realtors.rets.client;
 
 /**
- * 
  * The search request sent from search() in RetsSession
- *
  */
 
 public class SearchRequest extends RetsHttpRequest {
-	
+
 	public static final int COUNT_NONE = 1;
 	public static final int COUNT_FIRST = 2;
 	public static final int COUNT_ONLY = 3;
@@ -29,7 +27,7 @@ public class SearchRequest extends RetsHttpRequest {
 	public static final String KEY_STANDARDNAMES = "StandardNames";
 
 
-	private String type;
+	private final String type;
 
 	public SearchRequest(String stype, String sclass, String query) {
 		setQueryParameter(KEY_TYPE, stype);
@@ -39,7 +37,7 @@ public class SearchRequest extends RetsHttpRequest {
 		setQueryParameter(KEY_FORMAT, FORMAT_COMPACT);
 		setQueryParameter(KEY_DMQLVERSION, RETS_DMQL2);
 	}
-	
+
 
 	@Override
 	public void setUrl(CapabilityUrls urls) {
@@ -110,10 +108,12 @@ public class SearchRequest extends RetsHttpRequest {
 		setQueryParameter(KEY_OFFSET, null);
 	}
 
-	/** TODO should the search automatically handle this???  shouldn't this be setable by vendor is that predicatable? */
+	/**
+	 * TODO should the search automatically handle this???  shouldn't this be setable by vendor is that predicatable?
+	 */
 	@Override
 	public void setVersion(RetsVersion ver) {
-		if (RetsVersion.RETS_10.equals(ver)) {
+		if (RetsVersion.v1_0.equals(ver)) {
 			setQueryParameter(KEY_DMQLVERSION, RETS_DMQL1);
 		} else {
 			setQueryParameter(KEY_DMQLVERSION, RETS_DMQL2);

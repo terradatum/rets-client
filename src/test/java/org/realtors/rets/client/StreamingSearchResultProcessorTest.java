@@ -40,14 +40,14 @@ public class StreamingSearchResultProcessorTest extends TestCase {
 		assertEquals("wrong row data", "Data1", row[0]);
 
 		assertFalse("rows should be exhausted", result.hasNext());
-		assertFalse("max rows wrong", result.isMaxrows());
+		assertFalse("max rows wrong", result.isMaxRows());
 		assertTrue("search not complete", result.isComplete());
 	}
 
 	public void testEarlyCallToIsMaxRows() throws RetsException {
 		SearchResultSet result = runSearchTest(SearchResultHandlerTest.ALL_TAGS_TEST);
 		try {
-			result.isMaxrows();
+			result.isMaxRows();
 			fail("Should throw illegal state exception");
 		} catch (IllegalStateException e) {
 			// "success"
@@ -72,7 +72,7 @@ public class StreamingSearchResultProcessorTest extends TestCase {
 
 		assertFalse("rows should be exhausted", result.hasNext());
 		assertTrue("search not complete", result.isComplete());
-		assertTrue("max rows not set", result.isMaxrows());
+		assertTrue("max rows not set", result.isMaxRows());
 	}
 
 	public void testReplyCode20208() throws RetsException {
@@ -93,7 +93,7 @@ public class StreamingSearchResultProcessorTest extends TestCase {
 
 		assertFalse("rows should be exhausted", result.hasNext());
 		assertTrue("search not complete", result.isComplete());
-		assertTrue("max rows not set", result.isMaxrows());
+		assertTrue("max rows not set", result.isMaxRows());
 	}
 
 	public void testReplyCode20201WithColumns() throws RetsException {

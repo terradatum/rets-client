@@ -30,7 +30,7 @@ public abstract class RetsTestCase extends TestCase {
 	}
 
 	private String arrayToString(Object[] array) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		for (int i = 0; i < array.length; i++) {
 			Object o = array[i];

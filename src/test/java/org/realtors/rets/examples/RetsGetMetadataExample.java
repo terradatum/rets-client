@@ -1,15 +1,13 @@
 package org.realtors.rets.examples;
 
-import java.net.MalformedURLException;
-
 import org.realtors.rets.client.CommonsHttpClient;
 import org.realtors.rets.client.RetsException;
 import org.realtors.rets.client.RetsHttpClient;
 import org.realtors.rets.client.RetsSession;
 import org.realtors.rets.client.RetsVersion;
-import org.realtors.rets.common.metadata.types.MClass;
-import org.realtors.rets.common.metadata.types.MResource;
-import org.realtors.rets.common.metadata.types.MSystem;
+import org.realtors.rets.metadata.types.RetsClass;
+import org.realtors.rets.metadata.types.RetsResource;
+import org.realtors.rets.metadata.types.RetsSystem;
 
 /**
  * Simple Example performing a GetMetadata and iterating of the results
@@ -17,11 +15,11 @@ import org.realtors.rets.common.metadata.types.MSystem;
  */
 public class RetsGetMetadataExample {
 
-	public static void main(String[] args) throws MalformedURLException {
+	public static void main(String[] args) {
 
 		//Create a RetsHttpClient (other constructors provide configuration i.e. timeout, gzip capability)
 		RetsHttpClient httpClient = new CommonsHttpClient();
-		RetsVersion retsVersion = RetsVersion.RETS_1_7_2;
+		RetsVersion retsVersion = RetsVersion.v1_7_2;
 		String loginUrl = "http://theurloftheretsserver.com";
 
 		//Create a RetesSession with RetsHttpClient
@@ -40,17 +38,17 @@ public class RetsGetMetadataExample {
 		}
 
 		try {
-			MSystem system = session.getMetadata().getSystem();
+			RetsSystem system = session.getMetadata().getSystem();
 			System.out.println(
 					"SYSTEM: " + system.getSystemID() + 
 					" - " + system.getSystemDescription());
 
-			for(MResource resource: system.getMResources()) {
+			for(RetsResource resource: system.getRetsResources()) {
 
 				System.out.println(
 						"    RESOURCE: " + resource.getResourceID());
 
-				for(MClass classification: resource.getMClasses()) {
+				for(RetsClass classification: resource.getRetsClasses()) {
 					System.out.println(
 							"        CLASS: " + classification.getClassName() +
 							" - " + classification.getDescription());

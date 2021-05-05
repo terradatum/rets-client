@@ -34,12 +34,12 @@ public class GetObjectResponseIteratorTest extends TestCase {
 			+ "Object-ID: 5\r\n" + "\r\n" + BINARY_BLOB_5 + "\r\n--" + BOUNDARY + "--").getBytes();
 
 	public void testIterationMultipart() throws Exception {
-		GetObjectIterator<SingleObjectResponse> getObjectIterator = null;
+		GetObjectIterator<?> getObjectIterator;
 
-		Map headers = new HashMap();
+		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-Type", "multipart/parallel; boundary=\"" + BOUNDARY + "\"");
 		headers.put("MIME-Version", "1.0");
-		GetObjectResponse getObjectResponse = new GetObjectResponse(headers, new ByteArrayInputStream(MULTIPART_RESPONSE_BODY));
+		GetObjectResponse<SingleObjectResponse> getObjectResponse = new GetObjectResponse<>(headers, new ByteArrayInputStream(MULTIPART_RESPONSE_BODY));
 		getObjectIterator = getObjectResponse.iterator();
 
 		SingleObjectResponse firstResponse = getObjectIterator.next();
@@ -66,14 +66,14 @@ public class GetObjectResponseIteratorTest extends TestCase {
 	}
 
 	public void testIterationNonMultipart() throws Exception {
-		GetObjectIterator<SingleObjectResponse> getObjectIterator = null;
+		GetObjectIterator<?> getObjectIterator;
 
-		Map headers = new HashMap();
+		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-Type", "image/jpeg");
 		headers.put("MIME-Version", "1.0");
 		headers.put("Content-ID", "one");
 		headers.put("Object-ID", "1");
-		GetObjectResponse getObjectResponse = new GetObjectResponse(headers, new ByteArrayInputStream(BINARY_BLOB_1
+		GetObjectResponse<SingleObjectResponse> getObjectResponse = new GetObjectResponse<>(headers, new ByteArrayInputStream(BINARY_BLOB_1
 				.getBytes()));
 
 		getObjectIterator = getObjectResponse.iterator();
@@ -157,14 +157,14 @@ public class GetObjectResponseIteratorTest extends TestCase {
 	 * Some RETS servers send headers like "Content-type"
 	 */
 	public void testCaseInsensitiveHeaders() throws Exception {
-		GetObjectIterator<SingleObjectResponse> getObjectIterator = null;
+		GetObjectIterator<?> getObjectIterator;
 
-		Map headers = new HashMap();
+		Map<String, String> headers = new HashMap<>();
 		headers.put("Content-type", "image/jpeg");
 		headers.put("MIME-version", "1.0");
 		headers.put("content-id", "one");
 		headers.put("Object-id", "1");
-		GetObjectResponse getObjectResponse = new GetObjectResponse(headers, new ByteArrayInputStream(BINARY_BLOB_1.getBytes()));
+		GetObjectResponse<SingleObjectResponse> getObjectResponse = new GetObjectResponse<>(headers, new ByteArrayInputStream(BINARY_BLOB_1.getBytes()));
 
 		getObjectIterator = getObjectResponse.iterator();
 

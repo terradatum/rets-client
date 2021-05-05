@@ -17,14 +17,14 @@ import java.util.List;
  * javadoc string.
  */
 public class BrokerCodeRequredException extends RetsException {
-    private final List mCodeList;
+	private final List mCodeList;
 
-    public BrokerCodeRequredException(Collection codes) {
-        this.mCodeList = Collections.unmodifiableList(new ArrayList(codes));
-    }
+	public BrokerCodeRequredException(Collection codes) {
+		this.mCodeList = Collections.unmodifiableList(new ArrayList(codes));
+	}
 
-    public List getCodeList(){
-        return this.mCodeList;
-    }
+	public List getCodeList() {
+		return this.mCodeList;
+	}
 
 }

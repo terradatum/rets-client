@@ -7,7 +7,7 @@ import java.io.Reader;
  * Interface for parsing results from a RETS query/search
  */
 public interface SearchResultProcessor {
-	public SearchResultSet parse(InputStream in) throws RetsException;
+	SearchResultSet parse(InputStream in);
 
-	public SearchResultSet parse(Reader in) throws RetsException;
+	SearchResultSet parse(Reader in);
 }

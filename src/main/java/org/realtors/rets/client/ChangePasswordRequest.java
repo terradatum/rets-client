@@ -1,13 +1,13 @@
 package org.realtors.rets.client;
 
-import java.security.GeneralSecurityException;
-import java.security.MessageDigest;
+import org.apache.commons.codec.binary.Base64;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 
 public class ChangePasswordRequest extends VersionInsensitiveRequest {
 	public ChangePasswordRequest(String username, String oldPassword, String newPassword) throws RetsException {

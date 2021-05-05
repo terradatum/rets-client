@@ -1,6 +1,5 @@
 package org.realtors.rets.examples;
 
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -21,11 +20,11 @@ import org.realtors.rets.client.SingleObjectResponse;
 public class RetsGetObjectURLExample {
 
 
-	public static void main(String[] args) throws MalformedURLException {
+	public static void main(String[] args) {
 
 		//Create a RetsHttpClient (other constructors provide configuration i.e. timeout, gzip capability)
 		RetsHttpClient httpClient = new CommonsHttpClient();
-		RetsVersion retsVersion = RetsVersion.RETS_1_7_2;
+		RetsVersion retsVersion = RetsVersion.v1_7_2;
 		String loginUrl = "http://theurloftheretsserver.com";
 
 		//Create a RetesSession with RetsHttpClient
@@ -51,9 +50,8 @@ public class RetsGetObjectURLExample {
 			GetObjectRequest req = new GetObjectRequest(sResource, objType);
 			req.setLocationOnly(locationOnly);
 			//Add the list of ids to request on (ids can be determined from records)
-			Iterator<String> idsIter = idsList.iterator();
-			while(idsIter.hasNext()) {
-				req.addObject(idsIter.next(), seqNum);
+			for (String s : idsList) {
+				req.addObject(s, seqNum);
 			}
 
 			//Execute the retrieval of objects 
@@ -61,7 +59,7 @@ public class RetsGetObjectURLExample {
 
 			//Iterate over each Object 
 			while (singleObjectResponseIter.hasNext()) {
-				SingleObjectResponse sor = (SingleObjectResponse)singleObjectResponseIter.next();
+				SingleObjectResponse sor = singleObjectResponseIter.next();
 
 				//Retrieve in info and print
 				String type =			sor.getType();

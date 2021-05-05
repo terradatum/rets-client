@@ -23,7 +23,7 @@ public class SearchResultHandlerTest extends RetsTestCase {
 	}
 
 	SearchResult runSearchTest(String input, InvalidReplyCodeHandler invalidReplyCodeHandler) throws RetsException {
-		SearchResultImpl res = new SearchResultImpl();
+		SimpleSearchResult res = new SimpleSearchResult();
 		SearchResultHandler h = new SearchResultHandler(res, invalidReplyCodeHandler, CompactRowPolicy.DEFAULT);
 		InputSource source = new InputSource(new StringReader(input));
 		h.parse(source);
@@ -41,14 +41,14 @@ public class SearchResultHandlerTest extends RetsTestCase {
 		String[] row = result.getRow(0);
 		assertEquals("wrong row width", 1, row.length);
 		assertEquals("wrong row data", "Data1", row[0]);
-		assertFalse("max rows wrong", result.isMaxrows());
+		assertFalse("max rows wrong", result.isMaxRows());
 	}
 
 	public void testAllTags() throws RetsException {
 		SearchResult result = runSearchTest(ALL_TAGS_TEST);
 		assertTrue("search not complete", result.isComplete());
 		assertEquals("extended count wrong", 100, result.getCount());
-		assertTrue("max rows not set", result.isMaxrows());
+		assertTrue("max rows not set", result.isMaxRows());
 		String[] row = result.getRow(0);
 		assertNotNull("row 0 is null", row);
 		assertEquals("wrong number of row[0] elements", 1, row.length);
@@ -63,7 +63,7 @@ public class SearchResultHandlerTest extends RetsTestCase {
 		SearchResult result = runSearchTest(MAXROWS_REPLYCODE);
 		assertTrue("search not complete", result.isComplete());
 		assertEquals("extended count wrong", 100, result.getCount());
-		assertTrue("max rows not set", result.isMaxrows());
+		assertTrue("max rows not set", result.isMaxRows());
 		String[] row = result.getRow(0);
 		assertNotNull("row 0 is null", row);
 		assertEquals("wrong number of row[0] elements", 1, row.length);

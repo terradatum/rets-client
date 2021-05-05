@@ -1,17 +1,10 @@
 package org.realtors.rets.examples;
 
-import java.net.MalformedURLException;
-
 import org.apache.commons.lang.StringUtils;
-import org.realtors.rets.client.CommonsHttpClient;
-import org.realtors.rets.client.RetsException;
-import org.realtors.rets.client.RetsHttpClient;
-import org.realtors.rets.client.RetsSession;
-import org.realtors.rets.client.RetsVersion;
-import org.realtors.rets.client.SearchRequest;
-import org.realtors.rets.client.SearchResultImpl;
+import org.realtors.rets.client.*;
 
 import javax.xml.parsers.SAXParserFactory;
+import java.util.Collections;
 
 /**
  * Simple Example performing a search and iterating over the results
@@ -19,11 +12,11 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class RetsSearchExample {
 
-	public static void main(String[] args) throws MalformedURLException {
+	public static void main(String[] args) {
 
 		//Create a RetsHttpClient (other constructors provide configuration i.e. timeout, gzip capability)
 		RetsHttpClient httpClient = new CommonsHttpClient();
-		RetsVersion retsVersion = RetsVersion.RETS_1_7_2;
+		RetsVersion retsVersion = RetsVersion.v1_7_2;
 		String loginUrl = "http://theurloftheretsserver.com";
 
 		//Create a RetesSession with RetsHttpClient
@@ -52,34 +45,38 @@ public class RetsSearchExample {
 		String select ="field1,field2,field3,field4,field5";
 		request.setSelect(select);
 
-		//Set request to retrive count if desired
+		//Set request to retrieve count if desired
 		request.setCountFirst();
 
-		SearchResultImpl response;
 		try {
 			//Execute the search
-			response= (SearchResultImpl) session.search(request, SAXParserFactory.newInstance());
+			SimpleSearchResult searchResult = new SimpleSearchResult();
+			//Ignore RETS Reply Code 20203 - often, the server will still return data
+			SearchResultHandler handler = new SearchResultHandler(
+					searchResult,
+					new IgnoreInvalidReplyCodeHandler(Collections.singletonList(20203)),
+					CompactRowPolicy.DEFAULT);
+			session.search(request, handler);
 
 			//Print out count and columns
-			int count = response.getCount();
+			int count = searchResult.getCount();
 			System.out.println("COUNT: " + count);
-			System.out.println("COLUMNS: " + StringUtils.join(response.getColumns(), "\t"));
+			System.out.println("COLUMNS: " + StringUtils.join(searchResult.getColumns(), "\t"));
 
 			//Iterate over, print records
-			for (int row = 0; row < response.getRowCount(); row++){
-				System.out.println("ROW"+ row +": " + StringUtils.join(response.getRow(row), "\t"));
+			for (int row = 0; row < searchResult.getRowCount(); row++){
+				System.out.println("ROW"+ row +": " + StringUtils.join(searchResult.getRow(row), "\t"));
 			}
 		} catch (RetsException e) {
 			e.printStackTrace();
 		} 
 		finally {
-			if(session != null) { 
-				try {
-					session.logout(); 
-				} 
-				catch(RetsException e) {
-					e.printStackTrace();
-				}
+			try {
+				session.logout();
+			}
+			catch(RetsException e) {
+				// this happens a lot, usually "Invalid RETS Session ID" - best to trace the exception but ignore it
+				e.printStackTrace();
 			}
 		}
 	}

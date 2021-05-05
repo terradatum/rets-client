@@ -1,6 +1,7 @@
 package org.realtors.rets.client;
 
 import org.apache.commons.lang.SystemUtils;
+
 /**
  * Exception class for invalid reply codes from a Rets server
  */
@@ -19,12 +20,12 @@ public class InvalidReplyCodeException extends RetsException {
 
 	@Override
 	public String getMessage() {
-		StringBuffer sb = new StringBuffer(this.mReplyCode.toString());
+		StringBuilder sb = new StringBuilder(this.mReplyCode.toString());
 		if (this.mMsg != null) {
-			sb.append(SystemUtils.LINE_SEPARATOR + this.mMsg);
+			sb.append(SystemUtils.LINE_SEPARATOR).append(this.mMsg);
 		}
 		if (this.mReqinfo != null) {
-			sb.append(SystemUtils.LINE_SEPARATOR + this.mReqinfo);
+			sb.append(SystemUtils.LINE_SEPARATOR).append(this.mReqinfo);
 		}
 		return sb.toString();
 	}

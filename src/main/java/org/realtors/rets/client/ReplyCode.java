@@ -1,11 +1,13 @@
 package org.realtors.rets.client;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ReplyCode {
 	// static initialization loop.... this declaration _MUST_ come before the members
-	private static final Map<Integer,ReplyCode> CODES = new HashMap<Integer,ReplyCode>();
+	// @formatter:off
+	private static final Map<Integer, ReplyCode> CODES = new HashMap<>();
+	// @formatter:on
 
 	public static final ReplyCode SUCCESS = new ReplyCode(0, "Success");
 	public static final ReplyCode ZERO_BALANCE = new ReplyCode(20003, "Zero balance");
@@ -34,7 +36,7 @@ public class ReplyCode {
 	public static final ReplyCode OBJECT_UNAVAILABLE = new ReplyCode(20409, "Object Unavailable");
 	public static final ReplyCode REQUEST_TOO_LARGE_GETOBJECT = new ReplyCode(20410, "Request Too Large");
 	public static final ReplyCode TIMEOUT_GETOBJECT = new ReplyCode(20411, "Timeout");
-	public static final ReplyCode TOO_MANY_OUTSTANDING_QUERIES_GETOBJECT = new ReplyCode(20412,"Too Many Outstanding Queries");
+	public static final ReplyCode TOO_MANY_OUTSTANDING_QUERIES_GETOBJECT = new ReplyCode(20412, "Too Many Outstanding Queries");
 	public static final ReplyCode MISCELLANEOUS_ERROR_GETOBJECT = new ReplyCode(20413, "Miscellaneous Error");
 	public static final ReplyCode INVALID_RESOURCE = new ReplyCode(20500, "Invalid resource");
 	public static final ReplyCode INVALID_TYPE = new ReplyCode(20501, "Invalid type");
@@ -49,18 +51,24 @@ public class ReplyCode {
 	public static final ReplyCode TOO_MANY_OUSTANDING_REQUESTS = new ReplyCode(20512, "Too many outstanding requests");
 	public static final ReplyCode MISCELLANEOUS_ERROR = new ReplyCode(20513, "Miscellanous error");
 	public static final ReplyCode REQUESTED_DTD_UNAVAILABLE = new ReplyCode(20514, "Requested DTD unvailable");
-
 	private final int mValue;
 	private final String mMessage;
 
 	private ReplyCode(int value, String message) {
 		this.mValue = value;
 		this.mMessage = message;
-		if (CODES.containsValue(new Integer(value))) 
-			throw new IllegalArgumentException(String.format("value already used: %s ( %s ) ",value,message));
-		CODES.put(new Integer(value), this);
+		if (CODES.containsKey(value))
+			throw new IllegalArgumentException(String.format("value already used: %s ( %s ) ", value, message));
+		CODES.put(value, this);
 	}
 
+	public static ReplyCode fromValue(int value) {
+		ReplyCode replyCode = CODES.get(value);
+		if (replyCode != null)
+			return replyCode;
+
+		return new ReplyCode(value, "Unknown");
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -78,7 +86,7 @@ public class ReplyCode {
 
 	@Override
 	public String toString() {
-		return String.format("%s (%s)",this.mValue,this.mMessage);
+		return String.format("%s (%s)", this.mValue, this.mMessage);
 	}
 
 	public int getValue() {
@@ -87,14 +95,6 @@ public class ReplyCode {
 
 	public String getMessage() {
 		return this.mMessage;
-	}
-
-	public static ReplyCode fromValue(int value) {
-		ReplyCode replyCode = CODES.get(new Integer(value));
-		if (replyCode != null) 
-			return replyCode;
-
-		return new ReplyCode(value, "Unknown");
 	}
 
 }

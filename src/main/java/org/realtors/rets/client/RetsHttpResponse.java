@@ -1,27 +1,25 @@
 package org.realtors.rets.client;
 
-import java.util.Map;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * Interface for retrieving useful header fields from a RETS HTTP response
- * 
- *
  */
 
 public interface RetsHttpResponse {
-	public int getResponseCode() throws RetsException;
+	int getResponseCode();
 
-	public Map getHeaders() throws RetsException;
+	Map<String, String> getHeaders();
 
-	public String getHeader(String hdr) throws RetsException;
+	String getHeader(String hdr);
 
-	public String getCookie(String cookie) throws RetsException;
+	String getCookie(String cookie);
 
-	public String getCharset() throws RetsException;
-	
-	public InputStream getInputStream() throws RetsException;
+	String getCharset();
 
-	public Map getCookies() throws RetsException;
+	InputStream getInputStream() throws RetsException;
+
+	Map<String, String> getCookies();
 
 }

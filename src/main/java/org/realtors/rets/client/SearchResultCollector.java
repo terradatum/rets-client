@@ -6,13 +6,13 @@ package org.realtors.rets.client;
 
 public interface SearchResultCollector {
 
-	public void setCount(int count);
+	void setCount(int count);
 
-	public void setColumns(String[] columns);
+	void setColumns(String[] columns);
 
-	public boolean addRow(String[] row);
+	void addRow(String[] row);
 
-	public void setMaxrows();
+	void setMaxRows();
 
-	public void setComplete();
+	void setComplete();
 }

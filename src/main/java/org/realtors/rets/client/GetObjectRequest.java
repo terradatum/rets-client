@@ -1,13 +1,9 @@
 package org.realtors.rets.client;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Map;
-
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.*;
 
 public class GetObjectRequest extends VersionInsensitiveRequest {
 	public static final String KEY_RESOURCE = "Resource";
@@ -15,16 +11,16 @@ public class GetObjectRequest extends VersionInsensitiveRequest {
 	public static final String KEY_LOCATION = "Location";
 	public static final String KEY_ID = "ID";
 
-	private final Map mMap;
+	private final Map<String, Object> mMap;
 
 	public GetObjectRequest(String resource, String type) {
-		this(resource, type, new String[] { "*/*" });
+		this(resource, type, new String[]{"*/*"});
 	}
 
 	public GetObjectRequest(String resource, String type, String[] acceptMimeTypes) {
 		setQueryParameter(KEY_RESOURCE, resource);
 		setQueryParameter(KEY_TYPE, type);
-		this.mMap = new HashMap();
+		this.mMap = new HashMap<>();
 		setHeader("Accept", StringUtils.join(acceptMimeTypes, ", "));
 	}
 
@@ -58,12 +54,13 @@ public class GetObjectRequest extends VersionInsensitiveRequest {
 			if (ObjectUtils.equals(cur, id)) {
 				return;
 			}
-			Set s = new HashSet();
+			Set<Object> s = new HashSet<>();
 			s.add(cur);
 			s.add(id);
 			this.mMap.put(resourceEntity, s);
-		} else if (cur instanceof Set) {
-			((Set) cur).add(id);
+		} else if (cur instanceof Set<?>) {
+			//noinspection unchecked
+			((Set<Object>) cur).add(id);
 		} else {
 			/* NOTREACHED */
 			throw new RuntimeException(resourceEntity + " has invalid value " + "of type " + cur.getClass().getName());
@@ -72,19 +69,18 @@ public class GetObjectRequest extends VersionInsensitiveRequest {
 	}
 
 	private String makeIdStr() {
-		StringBuffer id = new StringBuffer();
-		Iterator iter = this.mMap.keySet().iterator();
+		StringBuilder id = new StringBuilder();
+		Iterator<String> iter = this.mMap.keySet().iterator();
 		while (iter.hasNext()) {
-			String key = (String) iter.next();
+			String key = iter.next();
 			id.append(key);
 			Object cur = this.mMap.get(key);
 			if (cur instanceof String) {
 				id.append(":");
 				id.append(cur);
 			} else if (cur instanceof Set) {
-				Iterator iter2 = ((Set) cur).iterator();
-				while (iter2.hasNext()) {
-					String val = (String) iter2.next();
+				for (Object o : ((Set<?>) cur).toArray()) {
+					String val = (String) o;
 					id.append(":");
 					id.append(val);
 				}
@@ -97,5 +93,4 @@ public class GetObjectRequest extends VersionInsensitiveRequest {
 		}
 		return id.toString();
 	}
-
 }

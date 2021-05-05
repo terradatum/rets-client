@@ -1,27 +1,25 @@
 package org.realtors.rets.client;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.realtors.rets.common.metadata.Metadata;
-import org.realtors.rets.common.metadata.MetadataException;
+import org.realtors.rets.metadata.Metadata;
+import org.realtors.rets.metadata.MetadataException;
 
 import javax.xml.parsers.SAXParserFactory;
+import java.util.Map;
 
 /**
  * RetsSession is the core class of the rets.client package.
  */
 public class RetsSession {
 	public static final String METADATA_TABLES = "metadata_tables.xml";
-	public static final String RETS_CLIENT_VERSION = "1.5";//change default version
+	public static final String RETS_CLIENT_VERSION = "1.7.2";
 
 	private static final Log LOG = LogFactory.getLog(RetsSession.class);
-	private static String sUserAgent = "crt-rets-client/" + RETS_CLIENT_VERSION;
-
+	private static String sUserAgent = "terradatum-rets-client/" + RETS_CLIENT_VERSION;
+	private final RetsHttpClient httpClient;
+	private final RetsTransport transport;
 	private CapabilityUrls capabilityUrls;
-	private RetsHttpClient httpClient;
-	private RetsTransport transport;
 	private String sessionId;
 
 
@@ -29,13 +27,13 @@ public class RetsSession {
 	 * Creates a new <code>RetsSession</code> instance.
 	 * You must call login(user, pass) before attempting any other
 	 * transactions.
-	 * 
+	 * <p>
 	 * Uses a  default implementation of RetsHttpClient based on
 	 * apache commons http client.
-	 *
+	 * <p>
 	 * Uses the RetsVersion.RETS_DEFAULT as the RetsVersion for
 	 * this session.
-	 * 
+	 * <p>
 	 * Uses sAgent at the User-Agent setting for this RetsSession.
 	 *
 	 * @param loginUrl URL of the Login transaction.
@@ -48,15 +46,15 @@ public class RetsSession {
 	 * Creates a new <code>RetsSession</code> instance.
 	 * You must call login(user, pass) before attempting any other
 	 * transactions.
-	 * 
+	 * <p>
 	 * Uses the RetsVersion.RETS_DEFAULT as the RetsVersion for
 	 * this session.
-	 * 
+	 * <p>
 	 * Uses sAgent at the User-Agent setting for this RetsSession.
 	 *
-	 * @param loginUrl URL of the Login transaction
+	 * @param loginUrl   URL of the Login transaction
 	 * @param httpClient a RetsHttpClient implementation.  The default
-	 *   is CommonsHttpClient.
+	 *                   is CommonsHttpClient.
 	 */
 	public RetsSession(String loginUrl, RetsHttpClient httpClient) {
 		this(loginUrl, httpClient, RetsVersion.DEFAULT);
@@ -66,16 +64,16 @@ public class RetsSession {
 	 * Creates a new <code>RetsSession</code> instance.
 	 * You must call login(user, pass) before attempting any other
 	 * transactions.
-	 *
+	 * <p>
 	 * Uses sAgent at the User-Agent setting for this RetsSession.
 	 *
-	 * @param loginUrl URL of the Login transaction
-	 * @param httpClient a RetsHttpClient implementation.  The default
-	 *   is CommonsHttpClient.
+	 * @param loginUrl    URL of the Login transaction
+	 * @param httpClient  a RetsHttpClient implementation.  The default
+	 *                    is CommonsHttpClient.
 	 * @param retsVersion The RetsVersion used by this RetsSession.
 	 */
 	public RetsSession(String loginUrl, RetsHttpClient httpClient, RetsVersion retsVersion) {
-		this(loginUrl, httpClient, retsVersion, sUserAgent,false);
+		this(loginUrl, httpClient, retsVersion, sUserAgent, false);
 	}
 
 	/**
@@ -83,11 +81,11 @@ public class RetsSession {
 	 * You must call login(user, pass) before attempting any other
 	 * transactions.
 	 *
-	 * @param loginUrl URL of the Login transaction
-	 * @param httpClient a RetsHttpClient implementation.  The default
-	 *   is CommonsHttpClient.
+	 * @param loginUrl    URL of the Login transaction
+	 * @param httpClient  a RetsHttpClient implementation.  The default
+	 *                    is CommonsHttpClient.
 	 * @param retsVersion The RetsVersion used by this RetsSession.
-	 * @param userAgent specific User-Agent to use for this session.
+	 * @param userAgent   specific User-Agent to use for this session.
 	 */
 	public RetsSession(String loginUrl, RetsHttpClient httpClient, RetsVersion retsVersion, String userAgent, boolean strict) {
 		this.capabilityUrls = new CapabilityUrls();
@@ -99,12 +97,23 @@ public class RetsSession {
 	}
 
 	/**
+	 * Sets the default User-Agent value for RetsSessions created without
+	 * a specified User-Agent value.
+	 *
+	 * @param userAgent Default User-Agent value to use for all RetsSession
+	 *                  objects created in the future.
+	 */
+	public static void setUserAgent(String userAgent) {
+		sUserAgent = userAgent;
+	}
+
+	/**
 	 * Query the current RetsVersion being used in this session.
-	 * 
-	 * Initially, this will be the value passed to the RetsTransport.  
-	 * However, if during auto-negotiation the RetsTransport changes 
+	 * <p>
+	 * Initially, this will be the value passed to the RetsTransport.
+	 * However, if during auto-negotiation the RetsTransport changes
 	 * the RetsSession, this value may change throughout the session.
-	 * 
+	 *
 	 * @return the current RetsVersion value being used by the
 	 * RetsTransport.
 	 */
@@ -114,7 +123,7 @@ public class RetsSession {
 
 	/**
 	 * Get the current RETS Session ID
-	 * 
+	 *
 	 * @return the current RETS Session ID or null is the server has
 	 * not specified one
 	 */
@@ -131,22 +140,12 @@ public class RetsSession {
 		this.transport.setMonitor(monitor);
 	}
 
-	public void setStrict(boolean strict) {
-		this.transport.setStrict(strict);
-	}
 	public boolean isStrict() {
 		return this.transport.isStrict();
 	}
 
-	/**
-	 * Sets the default User-Agent value for RetsSessions created without
-	 * a specified User-Agent value.
-	 *  
-	 * @param userAgent Default User-Agent value to use for all RetsSession
-	 * objects created in the future.
-	 */
-	public static void setUserAgent(String userAgent) {
-		sUserAgent = userAgent;
+	public void setStrict(boolean strict) {
+		this.transport.setStrict(strict);
 	}
 
 	public String getLoginUrl() {
@@ -155,7 +154,7 @@ public class RetsSession {
 
 	public Metadata getIncrementalMetadata() throws RetsException {
 		try {
-			return new Metadata(new MetaCollectorImpl(this.transport));
+			return new Metadata(new SimpleMetadataCollector(this.transport));
 		} catch (MetadataException e) {
 			throw new RetsException(e);
 		}
@@ -163,16 +162,17 @@ public class RetsSession {
 
 	/**
 	 * Get the complete RETS metadata.
-	 * 
+	 *
 	 * @return The RETS metadata object for these credentials.
-	 * 
 	 * @throws RetsException
 	 */
 	public Metadata getMetadata() throws RetsException {
 		return this.transport.getMetadata("null");
 	}
+
 	/**
 	 * Ability to download the raw metadata to a location
+	 *
 	 * @param location
 	 * @return
 	 * @throws RetsException
@@ -183,15 +183,13 @@ public class RetsSession {
 
 	/**
 	 * Perform a low level GetMetadatRequest.  To retrieve
-	 * structured metadata, 
-	 * 
-	 * @see #getMetadata()
-	 * 
+	 * structured metadata,
+	 *
 	 * @param req GetMetadataRequest
 	 * @return GetMetadataResponse, containing all MetaObjects
 	 * returned
-	 * 
 	 * @throws RetsException if an error occurs
+	 * @see #getMetadata()
 	 */
 	public GetMetadataResponse getMetadata(GetMetadataRequest req) throws RetsException {
 		return this.transport.getMetadata(req);
@@ -200,7 +198,7 @@ public class RetsSession {
 	/**
 	 * Fetches the action (MOTD) from the server.
 	 *
-	 * @exception RetsException if an error occurs
+	 * @throws RetsException if an error occurs
 	 */
 	private void getAction() throws RetsException {
 		String actionUrl = this.capabilityUrls.getActionUrl();
@@ -208,7 +206,7 @@ public class RetsSession {
 			LOG.warn("No Action-URL available, skipping");
 			return;
 		}
-		GenericHttpRequest actionRequest = new GenericHttpRequest(actionUrl){
+		GenericHttpRequest actionRequest = new GenericHttpRequest(actionUrl) {
 			@Override
 			public Map<String, String> getHeaders() {
 				return null;
@@ -223,27 +221,26 @@ public class RetsSession {
 	}
 
 	/**
-	 * Implementation that allow for single or multi-part 
+	 * Implementation that allow for single or multi-part
 	 * GetObject requests.
 	 *
 	 * @param req
 	 * @return
-	 * @exception RetsException if an error occurs
+	 * @throws RetsException if an error occurs
 	 */
-	public GetObjectResponse getObject(GetObjectRequest req) throws RetsException {
+	public GetObjectResponse<SingleObjectResponse> getObject(GetObjectRequest req) throws RetsException {
 		return this.transport.getObject(req);
 	}
 
 	/**
-	 *
 	 * @param resource
 	 * @param type
 	 * @param entity
 	 * @param id
 	 * @return response
-	 * @exception RetsException if an error occurs
+	 * @throws RetsException if an error occurs
 	 */
-	public GetObjectResponse getObject(String resource, String type, String entity, String id) throws RetsException {
+	public GetObjectResponse<SingleObjectResponse> getObject(String resource, String type, String entity, String id) throws RetsException {
 		GetObjectRequest req = new GetObjectRequest(resource, type);
 		req.addObject(entity, id);
 		return getObject(req);
@@ -255,26 +252,25 @@ public class RetsSession {
 	 *
 	 * @param userName Username to authenticate
 	 * @param password Password to authenticate with
-	 * @return LoginResponse if success.
-	 * @exception RetsException if authentication was denied
+	 * @throws RetsException if authentication was denied
 	 */
-	public LoginResponse login(String userName, String password) throws RetsException {
-		return login(userName, password, null, null);
+	public void login(String userName, String password) throws RetsException {
+		login(userName, password, null, null);
 	}
 
 	/**
 	 * Log into the RETS server (see RETS 1.5, section 4).  No other
 	 * transactions will work until you have logged in.
 	 *
-	 * @param userName username to authenticate
-	 * @param password password to authenticate with
-	 * @param brokerCode broker code if the same user belongs to multiple
-	 * brokerages.  May be null.
+	 * @param userName     username to authenticate
+	 * @param password     password to authenticate with
+	 * @param brokerCode   broker code if the same user belongs to multiple
+	 *                     brokerages.  May be null.
 	 * @param brokerBranch branch code if the same user belongs to multiple
-	 * branches.  May be null.  brokerCode is required if you want
-	 * brokerBranch to work.
+	 *                     branches.  May be null.  brokerCode is required if you want
+	 *                     brokerBranch to work.
 	 * @return LoginResponse if success.
-	 * @exception RetsException if authentication was denied
+	 * @throws RetsException if authentication was denied
 	 */
 
 	public LoginResponse login(String userName, String password, String brokerCode, String brokerBranch) throws RetsException {
@@ -294,15 +290,14 @@ public class RetsSession {
 
 	/**
 	 * Log out of the current session.  Another login _may_ re-establish a new connection
-	 * depending the the behavior of the {#link RetsHttpClient} and its' ability to 
-	 * maintain and restablish a connection.  
-	 * 
-	 * @return a LogoutResponse
+	 * depending the the behavior of the {#link RetsHttpClient} and its' ability to
+	 * maintain and restablish a connection.
+	 *
 	 * @throws RetsException if the logout transaction failed
 	 */
-	public LogoutResponse logout() throws RetsException {
+	public void logout() throws RetsException {
 		try {
-			return this.transport.logout();
+			this.transport.logout();
 		} finally {
 			this.setSessionId(null);
 		}
@@ -315,69 +310,72 @@ public class RetsSession {
 	 *
 	 * @param req Contains parameters on which to search.
 	 * @return a completed SearchResult
-	 * @exception RetsException if an error occurs
+	 * @throws RetsException if an error occurs
 	 */
 	public SearchResult search(SearchRequest req, SAXParserFactory factory) throws RetsException {
-		SearchResultImpl res = new SearchResultImpl();
+		SimpleSearchResult res = new SimpleSearchResult();
 		search(req, res, factory);
 		return res;
 	}
 
 	/**
-	 * Execute a RETS Search.  The collector object will be filled 
+	 * Execute a RETS Search.  The collector object will be filled
 	 * when this method is returned.  See RETS 1.52d, Section 5.
 	 *
-	 * @param req Contains parameters on which to search.
+	 * @param req       Contains parameters on which to search.
 	 * @param collector SearchResult object which will be informed of the results
-	 * as they come in.  If you don't need live results, see the other
-	 * search invocation.
-	 * @exception RetsException if an error occurs
+	 *                  as they come in.  If you don't need live results, see the other
+	 *                  search invocation.
+	 * @throws RetsException if an error occurs
 	 */
 	public void search(SearchRequest req, SearchResultCollector collector, SAXParserFactory factory) throws RetsException {
 		this.transport.search(req, collector, factory);
 	}
 
 	/**
+	 * Execute a RETS Search. The handler object contains both the collector
+	 * and the SAXFactory for parsing the returned XML.
+	 *
+	 * @param req     the search request
+	 * @param handler the search handler
+	 */
+	public void search(SearchRequest req, SearchResultHandler handler) throws RetsException {
+		this.transport.search(req, handler);
+	}
+
+	/**
 	 * Search and process the Search using a given SearchResultProcessor.
 	 *
-	 * @param req the search request
+	 * @param req       the search request
 	 * @param processor the result object that will process the data
 	 */
 	public SearchResultSet search(SearchRequest req, SearchResultProcessor processor) throws RetsException {
 		return this.transport.search(req, processor);
 	}
 
-	/** 
-	 * The lowest level integration.  This method is not recommened for general use.   
+	/**
+	 * The lowest level integration.  This method is not recommended for general use.
 	 */
-	public RetsHttpResponse request(RetsHttpRequest request) throws RetsException{
+	public RetsHttpResponse request(RetsHttpRequest request) throws RetsException {
 		return this.transport.doRequest(request);
 	}
 
 	/**
-	 * switch to a specific HttpMethodName, POST/GET, where the 
-	 * method is supported.  Where GET is not supported, POST 
+	 * switch to a specific HttpMethodName, POST/GET, where the
+	 * method is supported.  Where GET is not supported, POST
 	 * will be used.
+	 *
 	 * @param method the HttpMethodName to use
 	 */
 	public void setMethod(String method) {
 		this.transport.setMethod(method);
 	}
 
-	/** Make sure GC'd sessions are logged out. */
-	@Override
-	protected void finalize() throws Throwable {
-		try {
-			if( this.sessionId != null ) this.logout();
-		} finally {
-			super.finalize();
-		}
-	}
 	/**
 	 * Performs a search returning only the number of records resulting from a query.
-	 * 
+	 * <p>
 	 * Convenience method to get number records from a query
-	 * 
+	 *
 	 * @param req the search request
 	 * @return the number of records that returned from the search request
 	 * @throws RetsException
@@ -390,16 +388,15 @@ public class RetsSession {
 
 	/**
 	 * Gives the URL's of an Object request instead of object themselves
-	 *
+	 * <p>
 	 * Convenience method to get the URL's of the requeseted object only
-	 * 
+	 *
 	 * @param req
 	 * @return
 	 * @throws RetsException
 	 */
-	public GetObjectResponse getObjectUrl(GetObjectRequest req) throws RetsException {
+	public GetObjectResponse<SingleObjectResponse> getObjectUrl(GetObjectRequest req) throws RetsException {
 		req.setLocationOnly(true);
-		GetObjectResponse res = this.getObject(req);
-		return res;
+		return this.getObject(req);
 	}
 }

@@ -1,20 +1,18 @@
 package org.realtors.rets.client;
 
-import java.util.List;
-import java.util.StringTokenizer;
-import java.io.InputStream;
-import java.io.IOException;
-
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.StringTokenizer;
 
 abstract public class KeyValueResponse {
 	protected static final String CRLF = "\r\n";
@@ -43,7 +41,7 @@ abstract public class KeyValueResponse {
 				throw new InvalidReplyCodeException(replyCode);
 			}
 			Element capabilityContainer;
-			if (RetsVersion.RETS_10.equals(mVersion)) {
+			if (RetsVersion.v1_0.equals(mVersion)) {
 				capabilityContainer = retsElement;
 			} else {
 				List children = retsElement.getChildren();
@@ -58,9 +56,7 @@ abstract public class KeyValueResponse {
 				}
 			}
 			this.handleRetsResponse(capabilityContainer);
-		} catch (JDOMException e) {
-			throw new RetsException(e);
-		} catch (IOException e) {
+		} catch (JDOMException | IOException e) {
 			throw new RetsException(e);
 		}
 	}
@@ -74,7 +70,7 @@ abstract public class KeyValueResponse {
 		StringTokenizer tokenizer = new StringTokenizer(retsResponse.getText(), CRLF);
 		while (tokenizer.hasMoreTokens()) {
 			String line = tokenizer.nextToken();
-			String splits[] = StringUtils.split(line, "=");
+			String[] splits = StringUtils.split(line, "=");
 			String key = splits[0].trim();
 			// guard against a missing value in a KeyValueResponse
 			String value = splits.length > 1 ? splits[1].trim() : "";
@@ -87,25 +83,25 @@ abstract public class KeyValueResponse {
 
 	protected abstract void handleKeyValue(String key, String value) throws RetsException;
 
-	public void setStrict(boolean strict) {
-		this.mStrict = strict;
-	}
-
 	public boolean isStrict() {
 		return this.mStrict;
 	}
 
+	public void setStrict(boolean strict) {
+		this.mStrict = strict;
+	}
+
 	protected boolean matchKey(String key, String value) {
-		if (this.mStrict) 
+		if (this.mStrict)
 			return key.equals(value);
 
 		return key.equalsIgnoreCase(value);
 	}
 
 	protected void assertStrictWarning(Log log, String message) throws RetsException {
-		if (this.mStrict) 
+		if (this.mStrict)
 			throw new RetsException(message);
-		
+
 		log.warn(message);
 	}
 

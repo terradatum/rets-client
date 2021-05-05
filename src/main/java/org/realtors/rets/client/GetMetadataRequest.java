@@ -3,20 +3,19 @@ package org.realtors.rets.client;
 import org.apache.commons.lang.StringUtils;
 
 public class GetMetadataRequest extends VersionInsensitiveRequest {
-	private static final int COMPACT_FORMAT = 0;
-	private static final int STANDARD_XML_FORMAT = 1;
 	public static final String KEY_TYPE = "Type";
 	public static final String KEY_ID = "ID";
 	public static final String KEY_FORMAT = "Format";
 	public static final String FORMAT_STANDARD = "STANDARD-XML";
 	public static final String FORMAT_STANDARD_PREFIX = "STANDARD-XML:";
 	public static final String FORMAT_COMPACT = "COMPACT";
-
+	private static final int COMPACT_FORMAT = 0;
+	private static final int STANDARD_XML_FORMAT = 1;
 	private int format;
 	private String standardXmlVersion;
 
 	public GetMetadataRequest(String type, String id) throws RetsException {
-		this(type, new String[] { id });
+		this(type, new String[]{id});
 	}
 
 	public GetMetadataRequest(String type, String[] ids) throws RetsException {

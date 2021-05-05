@@ -1,16 +1,16 @@
 package org.realtors.rets.client;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.LinkedList;
-
 import org.apache.commons.lang.exception.NestableRuntimeException;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.InputSource;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.LinkedList;
+
 /**
  * SearchResultProcessor that returns a streaming SearchResult implementation.
- * 
+ *
  * @author jrayburn
  */
 public class StreamingSearchResultProcessor implements SearchResultProcessor {
@@ -21,12 +21,11 @@ public class StreamingSearchResultProcessor implements SearchResultProcessor {
 
 	/**
 	 * Construct a StreamingSearchResultProcessor.
-	 * 
-	 * Waits indefinitely for buffer to be read from by 
+	 * <p>
+	 * Waits indefinitely for buffer to be read from by
 	 * client.
-	 * 
-	 * @param bufferSize 
-	 * 	How many rows to buffer
+	 *
+	 * @param bufferSize How many rows to buffer
 	 */
 	public StreamingSearchResultProcessor(int bufferSize) {
 		this(bufferSize, 0);
@@ -34,27 +33,19 @@ public class StreamingSearchResultProcessor implements SearchResultProcessor {
 
 	/**
 	 * Construct a StreamingSearchResultProcessor.
-	 * 
-	 * Waits <code>timeout</code> milliseconds for buffer to 
+	 * <p>
+	 * Waits <code>timeout</code> milliseconds for buffer to
 	 * be read from by client.
-	 * 
-	 * @param bufferSize 
-	 * 	How many rows to buffer
-	 * 
-	 * @param timeout 
-	 * 	How long to wait, in milliseconds, for the buffer 
-	 * 	to be read from when full. 0 indicates an indefinite
-	 * 	wait.
+	 *
+	 * @param bufferSize How many rows to buffer
+	 * @param timeout    How long to wait, in milliseconds, for the buffer
+	 *                   to be read from when full. 0 indicates an indefinite
+	 *                   wait.
 	 */
 	public StreamingSearchResultProcessor(int bufferSize, int timeout) {
 		super();
 		this.mBufferSize = bufferSize;
 		this.mTimeout = timeout;
-	}
-
-	/** how to deal with badly delimited data */
-	public void setCompactRowPolicy(CompactRowPolicy badRowPolicy) {
-		this.mCompactRowPolicy = badRowPolicy;
 	}
 
 	private CompactRowPolicy getCompactRowPolicy() {
@@ -63,14 +54,21 @@ public class StreamingSearchResultProcessor implements SearchResultProcessor {
 		return this.mCompactRowPolicy;
 	}
 
-	public void setInvalidRelyCodeHandler(InvalidReplyCodeHandler invalidReplyCodeHandler) {
-		this.mInvalidReplyCodeHandler = invalidReplyCodeHandler;
+	/**
+	 * how to deal with badly delimited data
+	 */
+	public void setCompactRowPolicy(CompactRowPolicy badRowPolicy) {
+		this.mCompactRowPolicy = badRowPolicy;
 	}
 
 	private InvalidReplyCodeHandler getInvalidRelyCodeHandler() {
 		if (this.mInvalidReplyCodeHandler == null)
 			return InvalidReplyCodeHandler.FAIL;
 		return this.mInvalidReplyCodeHandler;
+	}
+
+	public void setInvalidRelyCodeHandler(InvalidReplyCodeHandler invalidReplyCodeHandler) {
+		this.mInvalidReplyCodeHandler = invalidReplyCodeHandler;
 	}
 
 	public SearchResultSet parse(InputStream reader) {
@@ -91,12 +89,12 @@ public class StreamingSearchResultProcessor implements SearchResultProcessor {
 }
 
 class StreamingThread extends Thread {
-	private StreamingSearchResult mResult;
-	private InputSource mSource;
-	private InvalidReplyCodeHandler mInvalidReplyCodeHandler;
-	private CompactRowPolicy badRowPolicy;
+	private final StreamingSearchResult mResult;
+	private final InputSource mSource;
+	private final InvalidReplyCodeHandler mInvalidReplyCodeHandler;
+	private final CompactRowPolicy badRowPolicy;
 
-	public StreamingThread(InputSource source, StreamingSearchResult result,InvalidReplyCodeHandler invalidReplyCodeHandler, CompactRowPolicy badRowPolicy) {
+	public StreamingThread(InputSource source, StreamingSearchResult result, InvalidReplyCodeHandler invalidReplyCodeHandler, CompactRowPolicy badRowPolicy) {
 		this.mSource = source;
 		this.mResult = result;
 		this.mInvalidReplyCodeHandler = invalidReplyCodeHandler;
@@ -129,7 +127,7 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 	private final int bufferSize;
 	private final LinkedList<String[]> buffer;
 
-	private boolean mMaxrows;
+	private boolean mMaxRows;
 	private int state;
 	private String[] columns;
 	private int count;
@@ -144,7 +142,7 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 		this.bufferSize = bufferSize;
 		this.timeout = timeout;
 		this.state = PREPROCESS;
-		this.buffer = new LinkedList<String[]>();
+		this.buffer = new LinkedList<>();
 		this.count = -1;
 		this.columns = null;
 		this.exception = null;
@@ -152,12 +150,12 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 
 	// ------------ Producer Methods
 
-	public synchronized boolean addRow(String[] row) {
+	public synchronized void addRow(String[] row) {
 		if (row.length > this.columns.length) {
-			throw new IllegalArgumentException(String.format("Invalid number of result columns: got %s, expected %s",row.length, this.columns.length));
+			throw new IllegalArgumentException(String.format("Invalid number of result columns: got %s, expected %s", row.length, this.columns.length));
 		}
 		if (row.length < this.columns.length) {
-			LogFactory.getLog(SearchResultCollector.class).warn(String.format("Row %s: Invalid number of result columns:  got %s, expected ",this.count, row.length, this.columns.length));
+			LogFactory.getLog(SearchResultCollector.class).warn(String.format("Row %s: Invalid number of result columns:  got %s, expected ", this.count, row.length, this.columns.length));
 		}
 
 		if (state() > BUFFER_FULL) {
@@ -186,7 +184,6 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 			pushState(BUFFER_AVAILABLE);
 
 		this.notifyAll();
-		return true;
 	}
 
 	public synchronized void setComplete() {
@@ -194,20 +191,8 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 		notifyAll();
 	}
 
-	public synchronized void setCount(int count) {
-		this.count = count;
-		pushState(PREPROCESS);
-		notifyAll();
-	}
-
-	public synchronized void setColumns(String[] columns) {
-		this.columns = columns;
-		pushState(BUFFER_AVAILABLE);
-		notifyAll();
-	}
-
-	public synchronized void setMaxrows() {
-		this.mMaxrows = true;
+	public synchronized void setMaxRows() {
+		this.mMaxRows = true;
 		pushState(COMPLETE);
 		notifyAll();
 	}
@@ -217,8 +202,6 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 		pushState(COMPLETE);
 		notifyAll();
 	}
-
-	// ----------- Consumer Methods
 
 	public synchronized boolean hasNext() throws RetsException {
 		// wait for someone to add data to the queue
@@ -242,11 +225,19 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 		return row;
 	}
 
+	// ----------- Consumer Methods
+
 	public synchronized int getCount() throws RetsException {
 		while (checkException() && state() < BUFFER_AVAILABLE) {
 			_wait();
 		}
 		return this.count;
+	}
+
+	public synchronized void setCount(int count) {
+		this.count = count;
+		pushState(PREPROCESS);
+		notifyAll();
 	}
 
 	public synchronized String[] getColumns() throws RetsException {
@@ -256,13 +247,19 @@ class StreamingSearchResult implements SearchResultSet, SearchResultCollector {
 		return this.columns;
 	}
 
-	public synchronized boolean isMaxrows() throws RetsException {
+	public synchronized void setColumns(String[] columns) {
+		this.columns = columns;
+		pushState(BUFFER_AVAILABLE);
+		notifyAll();
+	}
+
+	public synchronized boolean isMaxRows() throws RetsException {
 		checkException();
 
 		if (!isComplete())
 			throw new IllegalStateException("Cannot call isMaxRows until isComplete == true");
 
-		return this.mMaxrows;
+		return this.mMaxRows;
 	}
 
 	public synchronized SearchResultInfo getInfo() throws RetsException {

@@ -1,10 +1,10 @@
 package org.realtors.rets.client;
 
-import java.io.InputStream;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+
+import java.io.InputStream;
 
 /**
  * dbt is lame and hasn't overridden the default
@@ -13,7 +13,7 @@ import org.jdom.input.SAXBuilder;
 public class ChangePasswordResponse {
 	public ChangePasswordResponse(InputStream stream) throws RetsException {
 		SAXBuilder builder = new SAXBuilder();
-		Document document = null;
+		Document document;
 		try {
 			document = builder.build(stream);
 		} catch (Exception e) {

@@ -1,15 +1,16 @@
 package org.realtors.rets.client;
 
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LoginResponse extends KeyValueResponse {
 	private static final String BROKER_KEY = "Broker";
@@ -24,7 +25,7 @@ public class LoginResponse extends KeyValueResponse {
 	private static final String METADATA_TIMESTAMP_KEY = "MetadataTimestamp";
 	private static final String MIN_METADATA_TIMESTAMP_KEY = "MinMetadataTimestamp";
 	private static final Log LOG = LogFactory.getLog(LoginResponse.class);
-
+	private final CapabilityUrls capabilityUrls;
 	private String sessionId;
 	private String memberName;
 	private String userInformation;
@@ -37,12 +38,11 @@ public class LoginResponse extends KeyValueResponse {
 	private String balance;
 	private int sessionTimeout;
 	private String passwordExpiration;
-	private CapabilityUrls capabilityUrls;
-	private Set brokerCodes;
+	private Set<String> brokerCodes;
 
 	public LoginResponse(String loginUrl) {
 		super();
-		this.brokerCodes = new HashSet();
+		this.brokerCodes = new HashSet<>();
 		URL url = null;
 		try {
 			url = new URL(loginUrl);
@@ -76,7 +76,7 @@ public class LoginResponse extends KeyValueResponse {
 			if (matchKey(key, BROKER_KEY)) {
 				String[] strings = StringUtils.split(value, ",");
 				if (strings.length > 0 && strings.length < 3) {
-					this.brokerCodes.add(strings);
+					this.brokerCodes.addAll(Arrays.asList(strings));
 				} else {
 					throw new RetsException("Invalid broker/branch code: " + value);
 				}
@@ -123,7 +123,7 @@ public class LoginResponse extends KeyValueResponse {
 			this.capabilityUrls.setGetMetadataUrl(value);
 		} else if (matchKey(key, CapabilityUrls.UPDATE_URL)) {
 			this.capabilityUrls.setUpdateUrl(value);
-		}else if (matchKey(key, CapabilityUrls.SERVER_INFO_URL)) {
+		} else if (matchKey(key, CapabilityUrls.SERVER_INFO_URL)) {
 			this.capabilityUrls.setServerInfo(value);
 			LOG.warn("Depreciated: " + key + " -> " + value);
 		} else if (matchKey(key, "Get")) {
@@ -157,7 +157,7 @@ public class LoginResponse extends KeyValueResponse {
 	public String getMinMetadataVersion() {
 		return this.minMetadataVersion;
 	}
-	
+
 	public String getMetadataTimestamp() {
 		return this.metadataTimestamp;
 	}

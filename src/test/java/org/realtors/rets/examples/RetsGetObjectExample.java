@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -26,11 +25,11 @@ import org.realtors.rets.client.SingleObjectResponse;
 public class RetsGetObjectExample {
 
 
-	public static void main(String[] args) throws MalformedURLException {
+	public static void main(String[] args) {
 
 		//Create a RetsHttpClient (other constructors provide configuration i.e. timeout, gzip capability)
 		RetsHttpClient httpClient = new CommonsHttpClient();
-		RetsVersion retsVersion = RetsVersion.RETS_1_7_2;
+		RetsVersion retsVersion = RetsVersion.v1_7_2;
 		String loginUrl = "http://theurloftheretsserver.com";
 
 		//Create a RetesSession with RetsHttpClient
@@ -54,9 +53,8 @@ public class RetsGetObjectExample {
 			GetObjectRequest req = new GetObjectRequest(sResource, objType);
 
 			//Add the list of ids to request on (ids can be determined from records)
-			Iterator<String> idsIter = idsList.iterator();
-			while(idsIter.hasNext()) {
-				req.addObject(idsIter.next(), seqNum);
+			for (String s : idsList) {
+				req.addObject(s, seqNum);
 			}
 
 			//Execute the retrieval of objects 
@@ -64,7 +62,7 @@ public class RetsGetObjectExample {
 
 			//Iterate over each Object 
 			while (singleObjectResponseIter.hasNext()) {
-				SingleObjectResponse sor = (SingleObjectResponse)singleObjectResponseIter.next();
+				SingleObjectResponse sor = singleObjectResponseIter.next();
 
 				//Retrieve in info and print
 				String type =			sor.getType();
@@ -86,7 +84,7 @@ public class RetsGetObjectExample {
 					int size = is.available();
 					String filename = dest + contentID +"-" + objectID + "." + type;
 					OutputStream out = new FileOutputStream(new File(filename)); 
-					int read = 0;
+					int read;
 					byte[] bytes = new byte[1024];
 
 					while ((read = is.read(bytes)) != -1) {

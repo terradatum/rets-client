@@ -1,41 +1,31 @@
 package org.realtors.rets.client;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.*;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
 /**
- * 
  * Handles XML parsing from response setting the proper fields using a SearchResultCollector
- *
  */
-public class SearchResultHandler implements ContentHandler, ErrorHandler{
+public class SearchResultHandler implements ContentHandler, ErrorHandler {
 	private static final Log LOG = LogFactory.getLog(SearchResultHandler.class);
 	private static SAXParserFactory FACTORY = SAXParserFactory.newInstance();
-
+	private final SearchResultCollector collector;
+	private final InvalidReplyCodeHandler invalidReplyCodeHandler;
+	private final CompactRowPolicy compactRowPolicy;
 	private int dataCount;
-	private SearchResultCollector collector;
 	private StringBuffer currentEntry;
 	private String delimiter;
 	private Locator locator;
 	private String[] columns;
-	private InvalidReplyCodeHandler invalidReplyCodeHandler;
-	private CompactRowPolicy compactRowPolicy;
 
 	public SearchResultHandler(SearchResultCollector r) {
 		this(r, InvalidReplyCodeHandler.FAIL, CompactRowPolicy.DEFAULT);
@@ -94,7 +84,7 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 			}
 			return;
 		}
-		if (name == "COUNT") {
+		if (name.equals("COUNT")) {
 			String s = atts.getValue("Records");
 			if (s == null) {
 				s = atts.getValue("", "Records");
@@ -106,7 +96,7 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 			this.collector.setCount(i);
 			return;
 		}
-		if (name == "DELIMITER") {
+		if (name.equals("DELIMITER")) {
 			String s = atts.getValue("value");
 			if (s == null) {
 				s = atts.getValue("", "value");
@@ -118,12 +108,12 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 			this.delimiter = "" + (char) i;
 			return;
 		}
-		if (name == "COLUMNS" || name == "DATA") {
+		if (name.equals("COLUMNS") || name.equals("DATA")) {
 			this.currentEntry = new StringBuffer();
 			return;
 		}
-		if (name == "MAXROWS") {
-			this.collector.setMaxrows();
+		if (name.equals("MAXROWS")) {
+			this.collector.setMaxRows();
 			return;
 		}
 		// Unknown tag. danger, will.
@@ -142,12 +132,14 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 		characters(ch, start, length);
 	}
 
-	/** do NOT use string.split() unless your prepared to deal with loss due to token boundary conditions */
+	/**
+	 * do NOT use string.split() unless your prepared to deal with loss due to token boundary conditions
+	 */
 	private String[] split(String input) throws SAXParseException {
 		if (this.delimiter == null) {
 			throw new SAXParseException("Invalid compact format - DELIMITER not specified", this.locator);
 		}
-		if( !input.startsWith(this.delimiter) ){
+		if (!input.startsWith(this.delimiter)) {
 			throw new SAXParseException("Invalid compact format", this.locator);
 		}
 		StringTokenizer tkn = new StringTokenizer(input, this.delimiter, true);
@@ -181,7 +173,7 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 				this.collector.setColumns(contents);
 				this.columns = contents;
 			} else {
-				if( this.compactRowPolicy.apply(this.dataCount, this.columns, contents) ) {
+				if (this.compactRowPolicy.apply(this.dataCount, this.columns, contents)) {
 					this.dataCount++;
 					this.collector.addRow(contents);
 				}
@@ -199,11 +191,11 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 		this.collector.setComplete();
 	}
 
-	public void startPrefixMapping(String prefix, String uri) throws SAXException {
+	public void startPrefixMapping(String prefix, String uri) {
 		// LOG.debug("prefix mapping: " + prefix);
 	}
 
-	public void endPrefixMapping(String prefix) throws SAXException {
+	public void endPrefixMapping(String prefix) {
 		// LOG.debug("prefix mapping: " + prefix);
 	}
 
@@ -232,18 +224,18 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 	}
 
 
-	
 	public void parse(InputSource src) throws RetsException {
 		parse(src, null);
 	}
+
 	/**
-	 * 
 	 * created in order to pass the charset to the parser for proper encoding
+	 *
 	 * @param str
 	 * @param charset
 	 * @throws RetsException
 	 */
-	
+
 	public void parse(InputStream str, String charset) throws RetsException {
 		parse(new InputSource(str), charset);
 		try {
@@ -252,34 +244,35 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler{
 			throw new RetsException(e);
 		}
 	}
+
 	/**
 	 * Pareses given source with the given charset
-	 * 
+	 *
 	 * @param src
 	 * @throws RetsException
 	 */
 	public void parse(InputSource src, String charset) throws RetsException {
 		String encoding = src.getEncoding();
-		if (encoding == null && (charset != null)){
+		if (encoding == null && (charset != null)) {
 			encoding = charset;
 			LOG.warn("Charset from headers:" + charset + ". Setting as correct encoding for parsing");
 			src.setEncoding(encoding);
 		}
 		try {
-				SAXParser p = FACTORY.newSAXParser();
-				XMLReader r = p.getXMLReader();
-				r.setContentHandler(this);
-				r.setErrorHandler(this);
-				r.parse(src);
-			} catch (SAXException se) {
-				if (se.getException() != null && se.getException() instanceof RetsException) {
-					throw (RetsException) se.getException();
-				}
-				throw new RetsException(se);
-			} catch (Exception e) {
-				LOG.error("An exception occured", e);
-				throw new RetsException(e);
-
+			SAXParser p = FACTORY.newSAXParser();
+			XMLReader r = p.getXMLReader();
+			r.setContentHandler(this);
+			r.setErrorHandler(this);
+			r.parse(src);
+		} catch (SAXException se) {
+			if (se.getException() != null && se.getException() instanceof RetsException) {
+				throw (RetsException) se.getException();
 			}
+			throw new RetsException(se);
+		} catch (Exception e) {
+			LOG.error("An exception occured", e);
+			throw new RetsException(e);
+
+		}
 	}
 }

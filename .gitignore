@@ -1,8 +1,9 @@
-*.class
+# Ignore all IntelliJ except for runConfigurations
+.idea
 *.iml
-/target
+!.idea/runConfigurations
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Maven
+logs/
+target/
+out/

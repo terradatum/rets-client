@@ -1,41 +1,31 @@
 package org.realtors.rets.client;
 
 
-import java.io.FileWriter;
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.realtors.rets.common.metadata.JDomCompactBuilder;
-import org.realtors.rets.common.metadata.JDomStandardBuilder;
-import org.realtors.rets.common.metadata.Metadata;
-import org.realtors.rets.common.metadata.MetadataBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.realtors.rets.metadata.JDomCompactBuilder;
+import org.realtors.rets.metadata.JDomStandardBuilder;
+import org.realtors.rets.metadata.Metadata;
+import org.realtors.rets.metadata.MetadataBuilder;
 
 import javax.xml.parsers.SAXParserFactory;
+import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
  * Implements the basic transport mechanism.  This class deals with the
  * very basic parts of sending the request, returning a response object,
  * and version negotiation.
- *
  */
 public class RetsTransport {
 	private static final String RETS_SESSION_ID_HEADER = "RETS-Session-ID"; // TODO spec says hyphen, Marketlinx uses an underscore
-
-	private RetsHttpClient client;
-	private CapabilityUrls capabilities;
-	private String method = "GET";
-	private RetsVersion version;
-	private boolean strict;
-	private NetworkEventMonitor monitor;
-	
 	private static final Log LOG = LogFactory.getLog(RetsTransport.class);
-
-	private static Map MONITOR_MSGS = new HashMap(){{
+	private static final Map<Class<?>, String> MONITOR_MSGS = new HashMap<>() {{
 		put(ChangePasswordRequest.class, "Transmitting change password request");
 		put(GetObjectRequest.class, "Retrieving media object");
 		put(LoginRequest.class, "Logging in");
@@ -43,16 +33,21 @@ public class RetsTransport {
 		put(LogoutRequest.class, "Logging out");
 		put(SearchRequest.class, "Executing search");
 	}};
-
+	private final RetsHttpClient client;
+	private CapabilityUrls capabilities;
+	private String method = "GET";
+	private RetsVersion version;
+	private boolean strict;
+	private NetworkEventMonitor monitor;
 
 	/**
 	 * Create a new transport instance.
-	 * @param client An http client (make sure you call setUserCredentials
-	 * on it before carrying out any transactions).
-	 * @param capabilities the initial capabilities url list.  This can be
-	 * replaced with a more up to date version at any time (for example,
-	 * post-login()) with setCapabilities()
 	 *
+	 * @param client       An http client (make sure you call setUserCredentials
+	 *                     on it before carrying out any transactions).
+	 * @param capabilities the initial capabilities url list.  This can be
+	 *                     replaced with a more up to date version at any time (for example,
+	 *                     post-login()) with setCapabilities()
 	 * @see RetsHttpClient#setUserCredentials
 	 */
 	public RetsTransport(RetsHttpClient client, CapabilityUrls capabilities) {
@@ -61,11 +56,12 @@ public class RetsTransport {
 
 	/**
 	 * Create a new transport instance to speak a specific RETS version.
-	 * @param client an http client
+	 *
+	 * @param client       an http client
 	 * @param capabilities the initial capabilities url list
-	 * @param version the RETS version to use during initial negotiation
-	 * (RetsTransport will automatically switch to whatever version the
-	 * server supports).
+	 * @param version      the RETS version to use during initial negotiation
+	 *                     (RetsTransport will automatically switch to whatever version the
+	 *                     server supports).
 	 */
 	public RetsTransport(RetsHttpClient client, CapabilityUrls capabilities, RetsVersion version, boolean strict) {
 		this.client = client;
@@ -78,12 +74,12 @@ public class RetsTransport {
 
 	/**
 	 * Query the current RetsVersion being used in this RetsTransport.
-	 * 
+	 * <p>
 	 * Initially, this will be the value with which this object was
 	 * constructed.
-	 *   
+	 * <p>
 	 * However, this value may change after login.
-	 * 
+	 *
 	 * @return the current RetsVersion value being used by the
 	 * RetsTransport.
 	 */
@@ -109,19 +105,21 @@ public class RetsTransport {
 	/**
 	 * Set our RetsHttpClient up with the correct default RETS version to use,
 	 * default to RETS 1.5.
-	 * @param retsVersion 
+	 *
+	 * @param retsVersion
 	 */
 	private void doVersionHeader(RetsVersion retsVersion) {
 		if (this.client == null)
 			return;
 		if (retsVersion == null)
-			retsVersion = RetsVersion.DEFAULT; 
+			retsVersion = RetsVersion.DEFAULT;
 		this.version = retsVersion;
 		this.client.addDefaultHeader(RetsVersion.RETS_VERSION_HEADER, this.version.toString());
 	}
 
 	/**
 	 * replace the capabilities url list with a new one
+	 *
 	 * @param capabilities the new capabilities url list
 	 */
 	public void setCapabilities(CapabilityUrls capabilities) {
@@ -129,20 +127,21 @@ public class RetsTransport {
 	}
 
 	/**
-	 * switch to a specific HttpMethodName, POST/GET, where the 
-	 * method is supported.  Where GET is not supported, POST 
+	 * switch to a specific HttpMethodName, POST/GET, where the
+	 * method is supported.  Where GET is not supported, POST
 	 * will be used.
+	 *
 	 * @param method the HttpMethodName to use
 	 */
 	public void setMethod(String method) {
 		this.method = method;
 	}
 
-	/** 
+	/**
 	 * Available as an integration last resort
 	 */
 	public RetsHttpResponse doRequest(RetsHttpRequest req) throws RetsException {
-		Object monitorobj = null;
+		Object monitorobj;
 		String msg = getMonitorMessage(req);
 		monitorobj = this.monitor.eventStart(msg);
 
@@ -175,7 +174,7 @@ public class RetsTransport {
 	 * @param req The login request
 	 * @return the LoginResponse object
 	 * @throws RetsException if the login failed or something went wrong on the
-	 * network
+	 *                       network
 	 * @see #setCapabilities
 	 */
 	public LoginResponse login(LoginRequest req) throws RetsException {
@@ -184,12 +183,19 @@ public class RetsTransport {
 		String versionHeader = retsHttpResponse.getHeader(RetsVersion.RETS_VERSION_HEADER);
 		// may be null, which is fine, return null, dont throw 
 		RetsVersion retsVersion = RetsVersion.getVersion(versionHeader);
-		if( retsVersion == null && this.strict ) 
-			throw new RetsException(String.format("RETS Version is a required response header, version '%s' is unrecognized",versionHeader));
+		if (retsVersion == null && this.strict)
+			throw new RetsException(String.format("RETS Version is a required response header, version '%s' is unrecognized", versionHeader));
 		// skip updating the client version if its not set (correctly) by the server
-		if( retsVersion != null ) this.doVersionHeader(retsVersion);
+		if (retsVersion != null) this.doVersionHeader(retsVersion);
 
 		LoginResponse response = new LoginResponse(this.capabilities.getLoginUrl());
+
+		// RETS 1.7.2, section 3.3, requires clients to include cookies set by the server.
+		Map<String, String> headers = retsHttpResponse.getHeaders();
+		String setCookie = headers.get("Set-Cookie");
+		if (setCookie != null && !setCookie.isEmpty()) {
+			this.client.addDefaultHeader("Cookie", setCookie);
+		}
 
 		String sessionId = retsHttpResponse.getCookie(RETS_SESSION_ID_HEADER);
 		response.setSessionId(sessionId);
@@ -217,21 +223,22 @@ public class RetsTransport {
 		response.setStrict(this.strict);
 		try {
 			response.parse(httpResponse.getInputStream(), this.version);
-		} catch(RetsException e) {
-			if (e.getMessage().contains("Invalid number of children")){// most RETS servers have issues logging out for some reason.
+		} catch (RetsException e) {
+			if (e.getMessage().contains("Invalid number of children")) {// most RETS servers have issues logging out for some reason.
 				LOG.warn("unsual response for logout request, but log out successful.");
 			}
-			
-		} 
+
+		}
 		return response;
 	}
 
 	/**
-	 * Perform a non-streaming search and pass all results from the 
+	 * Perform a non-streaming search and pass all results from the
 	 * SearchRequest to the given collector.
-	 *
+	 * <p>
 	 * 12/06/20 Added charset, needed for sax parser
-	 * @param req the search request
+	 *
+	 * @param req       the search request
 	 * @param collector the result object that will store the data
 	 */
 	public void search(SearchRequest req, SearchResultCollector collector, SAXParserFactory factory) throws RetsException {
@@ -240,10 +247,22 @@ public class RetsTransport {
 	}
 
 	/**
-	 * Override processing of the search completely by providing a 
-	 * SearchResultProcessor to process the results of the Search.
+	 * Perform a non-streaming search and pass all results from the
+	 * SearchRequest through the collector, and handled by the SearchHandler
 	 *
 	 * @param req the search request
+	 * @param handler the search handler
+	 */
+	public void search(SearchRequest req, SearchResultHandler handler) throws RetsException {
+		RetsHttpResponse httpResponse = doRequest(req);
+		handler.parse(httpResponse.getInputStream(), httpResponse.getCharset());
+	}
+
+	/**
+	 * Override processing of the search completely by providing a
+	 * SearchResultProcessor to process the results of the Search.
+	 *
+	 * @param req       the search request
 	 * @param processor the result object that will process the data
 	 */
 	public SearchResultSet search(SearchRequest req, SearchResultProcessor processor) throws RetsException {
@@ -252,20 +271,18 @@ public class RetsTransport {
 	}
 
 	/**
-	 *
 	 * @param req GetObject request
 	 * @return a GetObjectResponse
 	 * @throws RetsException if the request is not valid or a network error
-	 * occurs
+	 *                       occurs
 	 */
-	public GetObjectResponse getObject(GetObjectRequest req) throws RetsException {
+	public GetObjectResponse<SingleObjectResponse> getObject(GetObjectRequest req) throws RetsException {
 		if (this.capabilities.getGetObjectUrl() == null) {
 			throw new RetsException("Server does not support GetObject transaction.");
 		}
 		req.setUrl(this.capabilities);
 		RetsHttpResponse httpResponse = this.client.doRequest(this.method, req);
-		GetObjectResponse result = new GetObjectResponse(httpResponse.getHeaders(), httpResponse.getInputStream());
-		return result;
+		return new GetObjectResponse<>(httpResponse.getHeaders(), httpResponse.getInputStream());
 	}
 
 	public Metadata getMetadata(String location) throws RetsException {
@@ -276,16 +293,16 @@ public class RetsTransport {
 		}
 		try {
 			RetsHttpResponse httpResponse = doRequest(req);
-			Object monitorobj = null;
+			Object monitorobj;
 			monitorobj = this.monitor.eventStart("Parsing metadata");
 			try {
 				SAXBuilder xmlBuilder = new SAXBuilder();
 				Document xmlDocument = xmlBuilder.build(httpResponse.getInputStream());
-				if (!location.equals("null")){
-					 XMLOutputter outputter = new XMLOutputter();
-					 FileWriter writer = new FileWriter(location);
-					 outputter.output(xmlDocument, writer); 
-					 outputter.outputString(xmlDocument);
+				if (!location.equals("null")) {
+					XMLOutputter outputter = new XMLOutputter();
+					FileWriter writer = new FileWriter(location);
+					outputter.output(xmlDocument, writer);
+					outputter.outputString(xmlDocument);
 				}
 				MetadataBuilder metadataBuilder;
 				if (req.isCompactFormat()) {
@@ -294,9 +311,8 @@ public class RetsTransport {
 					metadataBuilder = new JDomStandardBuilder();
 				}
 				metadataBuilder.setStrict(this.strict);
-			
-		        
-		        
+
+
 				return metadataBuilder.doBuild(xmlDocument);
 			} finally {
 				this.monitor.eventFinish(monitorobj);
@@ -308,11 +324,11 @@ public class RetsTransport {
 
 	public GetMetadataResponse getMetadata(GetMetadataRequest req) throws RetsException {
 		RetsHttpResponse httpResponse = doRequest(req);
-		Object monitorobj = null;
+		Object monitorobj;
 		monitorobj = this.monitor.eventStart("Parsing metadata");
 		try {
 			try {
-				return new GetMetadataResponse(httpResponse.getInputStream(), req.isCompactFormat(),this.strict);
+				return new GetMetadataResponse(httpResponse.getInputStream(), req.isCompactFormat(), this.strict);
 			} catch (InvalidReplyCodeException e) {
 				e.setRequestInfo(req.toString());
 				throw e;

@@ -11,7 +11,7 @@ public interface InvalidReplyCodeHandler {
 		}
 	};
 
-	public void invalidRetsReplyCode(int replyCode) throws InvalidReplyCodeException;
+	void invalidRetsReplyCode(int replyCode) throws InvalidReplyCodeException;
 
-	public void invalidRetsStatusReplyCode(int replyCode) throws InvalidReplyCodeException;
+	void invalidRetsStatusReplyCode(int replyCode) throws InvalidReplyCodeException;
 }

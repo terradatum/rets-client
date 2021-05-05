@@ -1,0 +1,44 @@
+name: Terradatum JDBC CI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**/src/**'
+      - '**/pom.xml'
+      - '.github/workflows/main.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci') }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Slack notify build starting
+        uses: actions-ecosystem/action-slack-notifier@v1
+        with:
+          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          message: |
+            @${{ github.actor }} pushed commits. Starting build...
+          channel: metrics
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - name: Call dispatch-main.yml
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/actions/workflows/dispatch-main.yml/dispatches
+          repository: ${{ github.repository }}
+          mediaType: | # The | is significant!
+            previews:
+              - antiope
+          ref: master
+          inputs: |
+            github-actor: ${github.actor}
+            ref: ${{ steps.extract_branch.outputs.branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}

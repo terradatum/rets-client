@@ -2,6 +2,8 @@ package org.realtors.rets.client;
 
 public class LoginRequest extends VersionInsensitiveRequest {
 
+	public static final String KEY_BROKERCODE = "BrokerCode";
+
 	@Override
 	public void setUrl(CapabilityUrls urls) {
 		setUrl(urls.getLoginUrl());
@@ -18,6 +20,4 @@ public class LoginRequest extends VersionInsensitiveRequest {
 			}
 		}
 	}
-
-	public static final String KEY_BROKERCODE = "BrokerCode";
 }

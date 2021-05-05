@@ -1,26 +1,27 @@
 package org.realtors.rets.client;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.realtors.rets.common.util.CaseInsensitiveTreeMap;
+import org.realtors.rets.util.CaseInsensitiveTreeMap;
 
-/** Base Http Request object */
+import java.io.Serializable;
+import java.util.*;
+
+/**
+ * Base Http Request object
+ */
 public abstract class RetsHttpRequest implements Serializable {
-	private final Map<String,String> mHeaders;
-	private final SortedMap<String,String> mQueryParameters;
+	private final Map<String, String> mHeaders;
+	private final SortedMap<String, String> mQueryParameters;
 	protected String mUrl;
 
 	public RetsHttpRequest() {
-		this.mHeaders = new CaseInsensitiveTreeMap<String,String>();
-		this.mQueryParameters = new TreeMap<String,String>();
+		this.mHeaders = new CaseInsensitiveTreeMap<>();
+		this.mQueryParameters = new TreeMap<>();
+	}
+
+	public String getUrl() {
+		return this.mUrl;
 	}
 
 	public abstract void setUrl(CapabilityUrls urls);
@@ -29,27 +30,23 @@ public abstract class RetsHttpRequest implements Serializable {
 		this.mUrl = url;
 	}
 
-	public String getUrl() {
-		return this.mUrl;
-	}
-
 	public void setHeader(String key, String value) {
 		this.mHeaders.put(key, value);
 	}
 
-	public Map<String,String> getHeaders() {
+	public Map<String, String> getHeaders() {
 		return this.mHeaders;
 	}
 
 	public String getHttpParameters() {
-		if (this.mQueryParameters.isEmpty()) 
+		if (this.mQueryParameters.isEmpty())
 			return null;
 
-		List<String> params = new LinkedList<String>();
-		for(Map.Entry<String,String> param : this.mQueryParameters.entrySet()){
-			params.add(String.format("%s=%s",RetsUtil.urlEncode(param.getKey()),RetsUtil.urlEncode(param.getValue())));
+		List<String> params = new LinkedList<>();
+		for (Map.Entry<String, String> param : this.mQueryParameters.entrySet()) {
+			params.add(String.format("%s=%s", RetsUtil.urlEncode(param.getKey()), RetsUtil.urlEncode(param.getValue())));
 		}
-		return StringUtils.join(params.iterator(),"&");
+		return StringUtils.join(params.iterator(), "&");
 	}
 
 	protected void setQueryParameter(String name, String value) {
@@ -63,9 +60,7 @@ public abstract class RetsHttpRequest implements Serializable {
 	@Override
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this);
-		Iterator iterator = this.mQueryParameters.keySet().iterator();
-		while (iterator.hasNext()) {
-			String s = (String) iterator.next();
+		for (String s : this.mQueryParameters.keySet()) {
 			builder.append(s, this.mQueryParameters.get(s));
 		}
 		return builder.toString();

@@ -7,7 +7,7 @@ final class TestInvalidReplyCodeHandler implements InvalidReplyCodeHandler {
         throw new InvalidReplyCodeException(code);
     }
     
-    public void invalidRetsStatusReplyCode(int code) throws InvalidReplyCodeException {
+    public void invalidRetsStatusReplyCode(int code) {
         this.replyCode = code;
     }
 
