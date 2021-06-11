@@ -56,4 +56,4 @@ eval set -- "$PARAMS"
   -s "${DIR}"/.github/maven/settings.xml \
   --file "${DIR}"/pom.xml \
   install
-zip -j "rets-client-${NEXT_VERSION}" README.me CHANGELOG.md "./target/rets-client-${NEXT_VERSION}.jar"
+zip -j "rets-client-${NEXT_VERSION}" README.md CHANGELOG.md "./target/rets-client-${NEXT_VERSION}.jar"

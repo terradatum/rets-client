@@ -30,7 +30,7 @@
       "@semantic-release/github",
       {
         "assets": [
-          "dude-*.zip"
+          "rets-client-*.zip"
         ]
       }
     ],
