@@ -30,10 +30,7 @@
       "@semantic-release/github",
       {
         "assets": [
-          "LICENSE",
-          "README.md",
-          "CHANGELOG.md",
-          "**/target/*.?ar"
+          "dude-*.zip"
         ]
       }
     ],

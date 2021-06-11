@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# these are very important to fail-fast during shell execution
 set -euf -o pipefail
 
 SOURCE="${BASH_SOURCE[0]}"
@@ -48,8 +49,11 @@ eval set -- "$PARAMS"
 "${DIR}"/mvnw -B -U -V \
   -s "${DIR}"/.github/maven/settings.xml \
   --file "${DIR}"/pom.xml \
-  versions:set -DgenerateBackupPoms=false -DnewVersion="${NEXT_VERSION}" \
-  && "${DIR}"/mvnw -B -U -V \
-    -s "${DIR}"/.github/maven/settings.xml \
-    --file "${DIR}"/pom.xml \
-    install
+  -DgenerateBackupPoms=false \
+  -DnewVersion="${NEXT_VERSION}" \
+  versions:set
+"${DIR}"/mvnw -B -U -V \
+  -s "${DIR}"/.github/maven/settings.xml \
+  --file "${DIR}"/pom.xml \
+  install
+zip "rets-client-${NEXT_VERSION}" CHANGELOG.md "./target/rets-client-${NEXT_VERSION}.jar"

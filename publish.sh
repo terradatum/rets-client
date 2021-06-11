@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# these are very important to fail-fast during shell execution
 set -euf -o pipefail
 
 SOURCE="${BASH_SOURCE[0]}"
