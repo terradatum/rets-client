@@ -47,29 +47,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Dump the get_version elements
+      - name: If SNAPSHOT, set next-snapshot-version in pom.xml
+        if: ${{ steps.semantic_release.outputs.new_release_published }} && ${{ steps.get_version.outputs.snapshot-release = 'true' }}
         env:
-          SEMVER_ACTION: ${{ toJSON(steps.get_version.outputs) }}
-        run: echo "${SEMVER_ACTION}"
-
-#      - name: If SNAPSHOT, set next-snapshot-version in pom.xml
-#        if: success() && ${{ steps.get_version.outputs.snapshot-release = 'true' }}
-#        env:
-#          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
-#        run: |
-#          mvn -B -U -V \
-#            -s "${GITHUB_WORKSPACE}"/.github/maven/settings.xml \
-#            --file "${GITHUB_WORKSPACE}"/pom.xml \
-#            -DgenerateBackupPoms=false \
-#            -DnewVersion=${NEXT_SNAPSHOT_VERSION} \
-#            versions:set
-#      - name: If SNAPSHOT, commmit and push changes
-#        if: ${{ steps.get_version.outputs.snapshot-release }}
-#        env:
-#          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
-#        run: |
-#          git config user.email "terradatum-automation@terradatum.com"
-#          git config user.name "terradatum-automation"
-#          git add .
-#          git commit -m "Prepare version ${NEXT_SNAPSHOT_VERSION} [skip ci]"
-#          git push --follow-tags
+          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
+        run: |
+          mvn -B -U -V \
+            -s "${GITHUB_WORKSPACE}"/.github/maven/settings.xml \
+            --file "${GITHUB_WORKSPACE}"/pom.xml \
+            -DgenerateBackupPoms=false \
+            -DnewVersion=${NEXT_SNAPSHOT_VERSION} \
+            versions:set
+      - name: If SNAPSHOT, commmit and push changes
+        if: ${{ steps.get_version.outputs.snapshot-release }}
+        env:
+          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
+        run: |
+          git config user.email "terradatum-automation@terradatum.com"
+          git config user.name "terradatum-automation"
+          git add .
+          git commit -m "Prepare version ${NEXT_SNAPSHOT_VERSION} [skip ci]"
+          git push --follow-tags
