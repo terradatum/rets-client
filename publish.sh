@@ -15,3 +15,4 @@ DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
   -s "${DIR}"/.github/maven/settings.xml \
   --file "${DIR}"/pom.xml \
   deploy -DskipTests
+rm -fv ./rets-client-*.zip
