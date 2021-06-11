@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.1](https://github.com/terradatum/rets-client/compare/v1.1.0...v1.1.1) (2021-06-11)
+
+
+### Bug Fixes
+
+* fix typos and misnamed assets for release packaging ([5ca7261](https://github.com/terradatum/rets-client/commit/5ca72617b672cc099c882a652f28834e7c8e8a14))
+
 ## [1.1.0](https://github.com/terradatum/rets-client/compare/v1.0.1...v1.1.0) (2021-06-11)
 
 
