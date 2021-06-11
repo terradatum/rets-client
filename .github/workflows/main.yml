@@ -3,7 +3,7 @@ name: Terradatum RETS Client CI
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - '**/src/**'
       - '**/pom.xml'
