@@ -46,6 +46,17 @@ jobs:
             conventional-changelog-conventionalcommits
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: If SNAPSHOT, set next-snapshot-version in pom.xml
+        if: steps.semantic_release.outputs.new_release_published == 'true' && steps.get_version.outputs.snapshot-release == 'true'
+        env:
+          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
+        run: |
+          mvn -B -U -V \
+            -s "${GITHUB_WORKSPACE}"/.github/maven/settings.xml \
+            --file "${GITHUB_WORKSPACE}"/pom.xml \
+            -DgenerateBackupPoms=false \
+            -DnewVersion=${NEXT_SNAPSHOT_VERSION} \
+            versions:set
       - name: Dump the outputs
         env:
           SEMVER_ACTION: ${{ toJSON(steps.get_version.outputs) }}
@@ -53,31 +64,13 @@ jobs:
         run: |
           echo "SEMVER_ACTION: ${SEMVER_ACTION}"
           echo "SEMANTIC_RELEASE: ${SEMANTIC_RELEASE}"
-#      - name: If SNAPSHOT, set next-snapshot-version in pom.xml
-#        if: ${{ steps.semantic_release.outputs.new_release_published && steps.get_version.outputs.snapshot-release }}
-#        env:
-#          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
-#        run: |
-#          mvn -B -U -V \
-#            -s "${GITHUB_WORKSPACE}"/.github/maven/settings.xml \
-#            --file "${GITHUB_WORKSPACE}"/pom.xml \
-#            -DgenerateBackupPoms=false \
-#            -DnewVersion=${NEXT_SNAPSHOT_VERSION} \
-#            versions:set
-#      - name: Dump the outputs
-#        env:
-#          SEMVER_ACTION: ${{ toJSON(steps.get_version.outputs) }}
-#          SEMANTIC_RELEASE: ${{ toJSON(steps.semantic_release.outputs) }}
-#        run: |
-#          echo "SEMVER_ACTION: ${SEMVER_ACTION}"
-#          echo "SEMANTIC_RELEASE: ${SEMANTIC_RELEASE}"
-#      - name: If SNAPSHOT, commmit and push changes
-#        if: ${{ steps.get_version.outputs.snapshot-release }}
-#        env:
-#          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
-#        run: |
-#          git config user.email "terradatum-automation@terradatum.com"
-#          git config user.name "terradatum-automation"
-#          git add .
-#          git commit -m "Prepare version ${NEXT_SNAPSHOT_VERSION} [skip ci]"
-#          git push --follow-tags
+      - name: If SNAPSHOT, commmit and push changes
+        if: ${{ steps.get_version.outputs.snapshot-release }}
+        env:
+          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
+        run: |
+          git config user.email "terradatum-automation@terradatum.com"
+          git config user.name "terradatum-automation"
+          git add .
+          git commit -m "Prepare version ${NEXT_SNAPSHOT_VERSION} [skip ci]"
+          git push --follow-tags
