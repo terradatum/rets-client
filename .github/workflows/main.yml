@@ -49,7 +49,7 @@ jobs:
 
       - name: Dump the get_version elements
         env:
-          SEMVER_ACTION: ${{ toJSON(get_version) }}
+          SEMVER_ACTION: ${{ toJSON(steps.get_version.outputs) }}
         run: echo "${SEMVER_ACTION}"
 
 #      - name: If SNAPSHOT, set next-snapshot-version in pom.xml
