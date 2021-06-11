@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/terradatum/rets-client/compare/v1.0.1...v1.1.0) (2021-06-11)
+
+
+### Features
+
+* package the artifacts for release ([3319699](https://github.com/terradatum/rets-client/commit/3319699e6f656d9960020a4a24038108948ad2a6))
+
 ### [1.0.1](https://github.com/terradatum/rets-client/compare/v1.0.0...v1.0.1) (2021-06-11)
 
 
