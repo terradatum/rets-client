@@ -1,4 +1,4 @@
-name: Terradatum Rets Client CI
+name: Terradatum RETS Client CI
 
 on:
   push:
@@ -8,37 +8,57 @@ on:
       - '**/src/**'
       - '**/pom.xml'
       - '.github/workflows/main.yml'
+      - 'prepare.sh'
+      - 'publish.sh'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci') }}
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Slack notify build starting
-        uses: actions-ecosystem/action-slack-notifier@v1
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
-          message: |
-            @${{ github.actor }} pushed commits. Starting build...
-          channel: metrics
+          fetch-depth: 0 # required for commit analysis - it needs access to full history
+          ref: ${{ github.event.inputs.ref }} # required to build/run on non-default branches from workflow_dispatch events
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-      - name: Call dispatch-main.yml
-        uses: octokit/request-action@v2.x
+      ## Setup Java and retrieve the version from the pom.xml file
+      - name: Setup Java 15
+        uses: actions/setup-java@v1
         with:
-          route: POST /repos/:repository/actions/workflows/dispatch-main.yml/dispatches
-          repository: ${{ github.repository }}
-          mediaType: | # The | is significant!
-            previews:
-              - antiope
-          ref: master
-          inputs: |
-            github-actor: ${github.actor}
-            ref: ${{ steps.extract_branch.outputs.branch }}
+          java-version: 15
+      - name: Get current version from pom.xml
+        uses: terradatum/semver-action@v1
+        id: get_version
+        with:
+          package-manager-type: maven
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic_release
+        with:
+          semantic_version: 16
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+            @semantic-release/exec
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+
+      - name: If SNAPSHOT, set next-snapshot-version in pom.xml
+        if: success() && ${{ steps.get_version.outputs.snapshot-release }}
+        env:
+          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
+        run: |
+          mvn -B -U -V \
+            -s "${GITHUB_WORKSPACE}"/.github/maven/settings.xml \
+            --file "${GITHUB_WORKSPACE}"/pom.xml \
+            versions:set -DgenerateBackupPoms=false -DnewVersion=${NEXT_SNAPSHOT_VERSION}
+      - name: If SNAPSHOT, commmit and push changes
+        if: ${{ steps.get_version.outputs.snapshot-release }}
+        env:
+          NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
+        run: |
+          git add .
+          git commit -m "Prepare version ${NEXT_SNAPSHOT_VERSION} [skip ci]"
+          git push --follow-tags
