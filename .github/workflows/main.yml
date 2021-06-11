@@ -19,6 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
+          persist-credentials: true
           fetch-depth: 0 # required for commit analysis - it needs access to full history
           ref: ${{ github.event.inputs.ref }} # required to build/run on non-default branches from workflow_dispatch events
 
@@ -47,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: If SNAPSHOT, set next-snapshot-version in pom.xml
-        if: success() && ${{ steps.get_version.outputs.snapshot-release }}
+        if: success() && ${{ steps.get_version.outputs.snapshot-release != 'undefined' }}
         env:
           NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
         run: |
