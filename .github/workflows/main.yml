@@ -1,4 +1,4 @@
-name: Terradatum JDBC CI
+name: Terradatum Rets Client CI
 
 on:
   push:
