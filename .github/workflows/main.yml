@@ -57,15 +57,8 @@ jobs:
             -DgenerateBackupPoms=false \
             -DnewVersion=${NEXT_SNAPSHOT_VERSION} \
             versions:set
-      - name: Dump the outputs
-        env:
-          SEMVER_ACTION: ${{ toJSON(steps.get_version.outputs) }}
-          SEMANTIC_RELEASE: ${{ toJSON(steps.semantic_release.outputs) }}
-        run: |
-          echo "SEMVER_ACTION: ${SEMVER_ACTION}"
-          echo "SEMANTIC_RELEASE: ${SEMANTIC_RELEASE}"
       - name: If SNAPSHOT, commmit and push changes
-        if: ${{ steps.get_version.outputs.snapshot-release }}
+        if: steps.semantic_release.outputs.new_release_published == 'true' && steps.get_version.outputs.snapshot-release == 'true'
         env:
           NEXT_SNAPSHOT_VERSION: ${{ steps.get_version.outputs.next-snapshot-version }}
         run: |
