@@ -7,9 +7,11 @@ on:
     paths:
       - '**/src/**'
       - '**/pom.xml'
+      - '.github/maven/settings.xml'
       - '.github/workflows/main.yml'
       - 'prepare.sh'
       - 'publish.sh'
+      - '.releaserc.json'
 
 jobs:
   build:
@@ -19,7 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          persist-credentials: true
           fetch-depth: 0 # required for commit analysis - it needs access to full history
           ref: ${{ github.event.inputs.ref }} # required to build/run on non-default branches from workflow_dispatch events
 
