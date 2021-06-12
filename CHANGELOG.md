@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.1.2](https://github.com/terradatum/rets-client/compare/v1.1.1...v1.1.2) (2021-06-12)
+
+
+### Bug Fixes
+
+* add zip extension to release artifact ([c2cdbab](https://github.com/terradatum/rets-client/commit/c2cdbab0030e2021ae05a799ea3964a80b64257e))
+* update semantic-release configuration ([892fc4e](https://github.com/terradatum/rets-client/commit/892fc4ebf4e16f04931f8e8e611d11f3fb5efbc4))
+
 ### [1.1.1](https://github.com/terradatum/rets-client/compare/v1.1.0...v1.1.1) (2021-06-11)
 
 
