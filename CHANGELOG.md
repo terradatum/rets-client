@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.3](https://github.com/terradatum/rets-client/compare/v1.1.2...v1.1.3) (2021-06-12)
+
+
+### Bug Fixes
+
+* should be able to delete the release artifact after it's been published? ([bfcd5be](https://github.com/terradatum/rets-client/commit/bfcd5bee6fc31b05b4fe9eb0a126921a4c613240))
+
 ### [1.1.2](https://github.com/terradatum/rets-client/compare/v1.1.1...v1.1.2) (2021-06-12)
 
 
