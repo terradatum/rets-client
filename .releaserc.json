@@ -5,7 +5,7 @@
     },
     {
       "name": "develop",
-      "prerelease": true
+      "prerelease": "rc"
     }
   ],
   "tagFormat": "v${version}",
