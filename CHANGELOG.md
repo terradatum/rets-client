@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.4](https://github.com/terradatum/rets-client/compare/v1.1.3...v1.1.4) (2021-06-13)
+
+
+### Bug Fixes
+
+* align the current version with the tracked releases ([2c11cbc](https://github.com/terradatum/rets-client/commit/2c11cbcae1816d8c43a36e66e56fc41f65b67651))
+
 ### [1.1.3](https://github.com/terradatum/rets-client/compare/v1.1.2...v1.1.3) (2021-06-12)
 
 
