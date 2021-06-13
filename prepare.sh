@@ -46,6 +46,12 @@ done
 eval set -- "$PARAMS"
 
 # set the new version and build
+# clean
+"${DIR}/mvnw" -B -U -V \
+  -s "${DIR}/.github/maven/settings.xml" \
+  --file "${DIR}/pom.xml" \
+  clean
+# set version
 "${DIR}"/mvnw -B -U -V \
   -s "${DIR}/.github/maven/settings.xml" \
   --file "${DIR}/pom.xml" \
