@@ -11,8 +11,5 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 
-"${DIR}"/mvnw -B -U -V \
-  -s "${DIR}/.github/maven/settings.xml" \
-  --file "${DIR}/pom.xml" \
-  deploy -DskipTests
-
+# clean up everything
+git clean -ffxd "${DIR}/"

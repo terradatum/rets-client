@@ -38,7 +38,8 @@
       "@semantic-release/exec",
       {
         "prepareCmd": "./prepare.sh -l ${lastRelease.version} -n ${nextRelease.version}",
-        "publishCmd": "./publish.sh"
+        "publishCmd": "./publish.sh",
+        "successCmd": "./success.sh"
       }
     ]
   ],

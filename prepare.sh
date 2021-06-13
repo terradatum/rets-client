@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # these are very important to fail-fast during shell execution
-set -euf -o pipefail
+set -eo pipefail
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -47,13 +47,17 @@ eval set -- "$PARAMS"
 
 # set the new version and build
 "${DIR}"/mvnw -B -U -V \
-  -s "${DIR}"/.github/maven/settings.xml \
-  --file "${DIR}"/pom.xml \
+  -s "${DIR}/.github/maven/settings.xml" \
+  --file "${DIR}/pom.xml" \
   -DgenerateBackupPoms=false \
   -DnewVersion="${NEXT_VERSION}" \
   versions:set
 "${DIR}"/mvnw -B -U -V \
-  -s "${DIR}"/.github/maven/settings.xml \
-  --file "${DIR}"/pom.xml \
+  -s "${DIR}/.github/maven/settings.xml" \
+  --file "${DIR}/pom.xml" \
   install
-zip -j "rets-client-${NEXT_VERSION}.zip" README.md CHANGELOG.md "./target/rets-client-${NEXT_VERSION}.jar"
+
+zip -j "${DIR}/rets-client-${NEXT_VERSION}.zip" \
+  "${DIR}/README.md" \
+  "${DIR}/CHANGELOG.md" \
+  "${DIR}/target/rets-client-${NEXT_VERSION}.jar"
