@@ -29,12 +29,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 15
-      - name: Get current version from pom.xml
-        uses: terradatum/semver-action@v1
-        id: get_version
-        with:
-          package-manager-type: maven
-
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic_release
@@ -47,6 +41,11 @@ jobs:
             conventional-changelog-conventionalcommits
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get current version from pom.xml
+        uses: terradatum/semver-action@v1
+        id: get_version
+        with:
+          package-manager-type: maven
       - name: If SNAPSHOT, set next-snapshot-version in pom.xml
         if: steps.semantic_release.outputs.new_release_published == 'true' && steps.get_version.outputs.snapshot-release == 'true'
         env:
