@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/terradatum/rets-client/compare/v1.1.4...v1.2.0) (2021-06-16)
+
+
+### Features
+
+* LoginResponse - update to 1.8/1.9 and fix unit tests ([357797e](https://github.com/terradatum/rets-client/commit/357797ea9179805edd29922c636003d979e75ac2))
+
 ### [1.1.4](https://github.com/terradatum/rets-client/compare/v1.1.3...v1.1.4) (2021-06-13)
 
 
