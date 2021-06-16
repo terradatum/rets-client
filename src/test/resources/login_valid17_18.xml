@@ -1,0 +1,27 @@
+<RETS ReplyCode="0" ReplyText="Operation Successful">
+    <RETS-RESPONSE>
+        Broker = B123, BO987
+        Info = MetadataVersion;MetadataVersion;128.256.512
+        Info = MinMetadataVersion;MetadataVersion;128.256.512
+        MemberName = Joe T. Schmoe
+        MetadataVersion = 1.00.000
+        MinMetadataVersion = 1.00.000
+        User = A123,5678,1,A123
+        Login = http://rets.test:6103/login
+        Logout = http://rets.test:6103/logout
+        Search = http://rets.test:6103/search
+        GetMetadata = http://rets.test:6103/getMetadata
+        ChangePassword = http://rets.test:6103/changePassword
+        GetObject = http://rets.test:6103/getObjectEx
+        Action = http://rets.test:6103/get
+        Balance = 44.21
+        TimeoutSeconds = 60
+        Info = MemberName;Character;Jane W. Schmoe
+        Info = Balance;;44.21
+        Info = TimeoutSeconds;;70
+        Info = VendorName;Character;CoreLogic
+        Info = ServerProductName;Character;Trestle
+        Info = MetadataId;Character;Trestle_Elastic-12
+        Info = UnknownIdentifier;Character;Monkeys
+    </RETS-RESPONSE>
+</RETS>

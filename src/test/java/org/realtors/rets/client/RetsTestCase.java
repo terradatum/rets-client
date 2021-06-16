@@ -1,13 +1,13 @@
 package org.realtors.rets.client;
 
-import java.io.InputStream;
-
 import junit.framework.TestCase;
+
+import java.io.InputStream;
 
 public abstract class RetsTestCase extends TestCase {
 	protected static InputStream getResource(String name) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		return cl.getResourceAsStream("org/realtors/rets/client/" + name);
+		return cl.getResourceAsStream(name);
 	}
 
 	public void assertEquals(String message, Object[] expected, Object[] actual) {
@@ -15,7 +15,6 @@ public abstract class RetsTestCase extends TestCase {
 		if (expected.length == actual.length) {
 			success = true;
 			for (int i = 0; i < expected.length; i++) {
-				success = true;
 				if (!expected[i].equals(actual[i])) {
 					success = false;
 					break;

@@ -225,9 +225,8 @@ public class RetsTransport {
 			response.parse(httpResponse.getInputStream(), this.version);
 		} catch (RetsException e) {
 			if (e.getMessage().contains("Invalid number of children")) {// most RETS servers have issues logging out for some reason.
-				LOG.warn("unsual response for logout request, but log out successful.");
+				LOG.warn("Unusual response for logout request, but log out successful.");
 			}
-
 		}
 		return response;
 	}
