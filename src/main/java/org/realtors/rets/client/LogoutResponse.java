@@ -1,7 +1,10 @@
 package org.realtors.rets.client;
 
+import com.google.common.collect.Multimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.Map;
 
 public class LogoutResponse extends KeyValueResponse {
 	private static final Log LOG = LogFactory.getLog(LogoutResponse.class);
@@ -14,7 +17,13 @@ public class LogoutResponse extends KeyValueResponse {
 	private String logoutMessage;
 
 	@Override
-	protected void handleKeyValue(String key, String value) throws RetsException {
+	protected void handleMultimap(Multimap<String, String> multimap) throws RetsException {
+		for (Map.Entry<String, String> entry : multimap.entries()) {
+			this.handleKeyValue(entry.getKey(), entry.getValue());
+		}
+	}
+
+	private void handleKeyValue(String key, String value) throws RetsException {
 		if (matchKey(key, CONNECT_TIME_KEY)) {
 			this.seconds = value;
 		} else if (matchKey(key, BILLING_KEY)) {

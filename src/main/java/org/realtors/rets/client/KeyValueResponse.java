@@ -1,5 +1,8 @@
 package org.realtors.rets.client;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
@@ -11,7 +14,9 @@ import org.jdom.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 abstract public class KeyValueResponse {
@@ -67,9 +72,12 @@ abstract public class KeyValueResponse {
 	}
 
 	private void handleRetsResponse(Element retsResponse) throws RetsException {
+		Map<String, String> map = new HashMap<>();
+		Multimap<String, String> multimap = ArrayListMultimap.create();
 		StringTokenizer tokenizer = new StringTokenizer(retsResponse.getText(), CRLF);
 		while (tokenizer.hasMoreTokens()) {
-			String line = tokenizer.nextToken();
+			String line = tokenizer.nextToken().trim();
+			if (Strings.isNullOrEmpty(line)) continue;
 			String[] splits = StringUtils.split(line, "=");
 			String key = splits[0].trim();
 			// guard against a missing value in a KeyValueResponse
@@ -77,11 +85,12 @@ abstract public class KeyValueResponse {
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("<" + key + "> -> <" + value + ">");
 			}
-			this.handleKeyValue(key, value);
+			multimap.put(key, value);
 		}
+		this.handleMultimap(multimap);
 	}
 
-	protected abstract void handleKeyValue(String key, String value) throws RetsException;
+	protected abstract void handleMultimap(Multimap<String, String> multimap) throws RetsException;
 
 	public boolean isStrict() {
 		return this.mStrict;
@@ -94,7 +103,6 @@ abstract public class KeyValueResponse {
 	protected boolean matchKey(String key, String value) {
 		if (this.mStrict)
 			return key.equals(value);
-
 		return key.equalsIgnoreCase(value);
 	}
 

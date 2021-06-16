@@ -1,0 +1,26 @@
+<RETS ReplyCode="0" ReplyText="Operation Successful">
+<RETS-RESPONSE>
+Info = BrokerCode;Character;B123
+Info = BrokerBranch;Character;BO987
+Info = MemberName;Character;Joe T. Schmoe
+Info = MetadataVersion;MetadataVersion;1.00.000
+Info = MinMetadataVersion;MetadataVersion;1.00.000
+Info = Balance;;44.21
+Info = TimeoutSeconds;;60
+Info = UserId;Character;A123
+Info = UserClass;Character;5678
+Info = UserLevel;Character;1
+Info = AgentCode;Character;A123
+Info = VendorName;Character;CoreLogic
+Info = ServerProductName;Character;Trestle
+Info = MetadataId;Character;Trestle_Elastic-12
+Info = UnknownIdentifier;Character;Monkeys
+Login = http://rets.test:6103/login
+Logout = http://rets.test:6103/logout
+Search = http://rets.test:6103/search
+GetMetadata = http://rets.test:6103/getMetadata
+ChangePassword = http://rets.test:6103/changePassword
+GetObject = http://rets.test:6103/getObjectEx
+Action = http://rets.test:6103/get
+</RETS-RESPONSE>
+</RETS>

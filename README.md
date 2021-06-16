@@ -1,13 +1,21 @@
 # rets-client
 
-The Terradatum RETS Client is a library used to access data on RETS compliant servers. This is a fork of
-the [Trulia Java Rets Client](https://github.com/trulia/trulia-java-rets-client), which is forked from
-the [jrets](https://github.com/jpfielding/jrets) master branch, which itself is a fork of
-the [CART RETS client](http://cart.sourceforge.net/) code.
+The Terradatum RETS Client is a library used to access data on RETS compliant servers. This is a fork with the following
+ancestry:
 
-This project no longer builds a "fat" Jar. For our purposes, the code is best served as a library Jar, which is then consumed by an Executable Jar, whether that consuming Jar is a single-process executable or a distributed microservice running in k8s.
+* [LucidSoftware][lucid-software]
+* [Trulia Java Rets Client][trulia-java-rets-client]
+* [jrets][jrets]
+* [CART RETS client][cart-rets-client]
 
-The [`CommonsHttpClient`](src/main/java/org/realtors/rets/client/CommonsHttpClient.java) code is based on the deprecated Http Client from Apache Commons, and needs to be migrated.
+This project no longer builds a "fat" Jar. For our purposes, the code is best served as a library Jar, which is then
+consumed by an Executable Jar, whether that consuming Jar is a single-process executable or a distributed microservice
+running in k8s.
+
+This build is a major breaking-change if you consume Metadata - mostly a name change spree that was totally unnecessary, but made me happy. Something like `MClass` -> `RetsClass`.
+
+The [`CommonsHttpClient`][commons-http-client] code is based on the deprecated
+Http Client from Apache Commons, and needs to be migrated to [`HttpClient 5.1`][apache-http-client-5].
 
 Simple example of a search:
 
@@ -240,3 +248,15 @@ public class RetsGetMetadataExample {
 ## License
 
 [Terradatum RETS Client is licensed under the MIT License](https://github.com/terradatum/rets-client/blob/master/LICENSE)
+
+[lucid-software]: https://github.com/lucidsoftware/trulia-java-rets-client
+
+[trulia-java-rets-client]: https://github.com/trulia/trulia-java-rets-client
+
+[jrets]: https://github.com/jpfielding/jrets
+
+[cart-rets-client]: http://cart.sourceforge.net/
+
+[commonshttpclient]: src/main/java/org/realtors/rets/client/CommonsHttpClient.java
+
+[apache-http-client-5]: https://hc.apache.org/httpcomponents-client-5.1.x/index.html
