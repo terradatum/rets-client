@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.2](https://github.com/terradatum/rets-client/compare/v1.2.1...v1.2.2) (2021-06-17)
+
+
+### Bug Fixes
+
+* **ci:** run the `@semantic-release/git` plugin AFTER the `@semantic-release/exec` plugin ([90d1c3f](https://github.com/terradatum/rets-client/commit/90d1c3f277132bdb87a3e7e88389c184408df2b1))
+
 ### [1.2.1](https://github.com/terradatum/rets-client/compare/v1.2.0...v1.2.1) (2021-06-17)
 
 
