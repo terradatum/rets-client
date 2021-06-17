@@ -183,11 +183,11 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler {
 	}
 
 	public void startDocument() {
-		LOG.info("Start document");
+		LOG.debug("Start document");
 	}
 
 	public void endDocument() {
-		LOG.info("Document ended");
+		LOG.debug("Document ended");
 		this.collector.setComplete();
 	}
 
@@ -220,7 +220,7 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler {
 	}
 
 	public void warning(SAXParseException e) {
-		LOG.warn("an error occured while parsing.  Attempting to continue", e);
+		LOG.warn("an error occurred while parsing.  Attempting to continue", e);
 	}
 
 
@@ -255,7 +255,7 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler {
 		String encoding = src.getEncoding();
 		if (encoding == null && (charset != null)) {
 			encoding = charset;
-			LOG.warn("Charset from headers:" + charset + ". Setting as correct encoding for parsing");
+			LOG.debug("Charset from headers:" + charset + ". Setting as correct encoding for parsing");
 			src.setEncoding(encoding);
 		}
 		try {
@@ -270,7 +270,7 @@ public class SearchResultHandler implements ContentHandler, ErrorHandler {
 			}
 			throw new RetsException(se);
 		} catch (Exception e) {
-			LOG.error("An exception occured", e);
+			LOG.error("An exception occurred", e);
 			throw new RetsException(e);
 
 		}
