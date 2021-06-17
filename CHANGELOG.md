@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.1](https://github.com/terradatum/rets-client/compare/v1.2.0...v1.2.1) (2021-06-17)
+
+
+### Bug Fixes
+
+* turn down the logging levels ([2b55d06](https://github.com/terradatum/rets-client/commit/2b55d06e45b5c73569084aaa046d4bb58c120d0f))
+
 ## [1.2.0](https://github.com/terradatum/rets-client/compare/v1.1.4...v1.2.0) (2021-06-16)
 
 
