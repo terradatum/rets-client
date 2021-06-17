@@ -19,12 +19,11 @@
       }
     ],
     [
-      "@semantic-release/git",
+      "@semantic-release/exec",
       {
-        "assets": [
-          "CHANGELOG.md",
-          "pom.xml"
-        ]
+        "prepareCmd": "./prepare.sh -l ${lastRelease.version} -n ${nextRelease.version}",
+        "publishCmd": "./publish.sh",
+        "successCmd": "./success.sh"
       }
     ],
     [
@@ -36,11 +35,12 @@
       }
     ],
     [
-      "@semantic-release/exec",
+      "@semantic-release/git",
       {
-        "prepareCmd": "./prepare.sh -l ${lastRelease.version} -n ${nextRelease.version}",
-        "publishCmd": "./publish.sh",
-        "successCmd": "./success.sh"
+        "assets": [
+          "CHANGELOG.md",
+          "pom.xml"
+        ]
       }
     ]
   ],
