@@ -1,26 +1,27 @@
 package org.realtors.rets.client;
 
+import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.realtors.rets.metadata.Metadata;
 import org.realtors.rets.metadata.MetadataException;
 
 import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * RetsSession is the core class of the rets.client package.
  */
 public class RetsSession {
-	public static final String METADATA_TABLES = "metadata_tables.xml";
-	public static final String RETS_CLIENT_VERSION = "1.7.2";
-
 	private static final Log LOG = LogFactory.getLog(RetsSession.class);
-	private static String sUserAgent = "terradatum-rets-client/" + RETS_CLIENT_VERSION;
+	private static String userAgent = "rets-client/1.2";
 	private final RetsHttpClient httpClient;
 	private final RetsTransport transport;
 	private CapabilityUrls capabilityUrls;
 	private String sessionId;
+	public static final String USER_AGENT = "User-Agent";
 
 
 	/**
@@ -73,7 +74,7 @@ public class RetsSession {
 	 * @param retsVersion The RetsVersion used by this RetsSession.
 	 */
 	public RetsSession(String loginUrl, RetsHttpClient httpClient, RetsVersion retsVersion) {
-		this(loginUrl, httpClient, retsVersion, sUserAgent, false);
+		this(loginUrl, httpClient, retsVersion, null, false);
 	}
 
 	/**
@@ -87,13 +88,27 @@ public class RetsSession {
 	 * @param retsVersion The RetsVersion used by this RetsSession.
 	 * @param userAgent   specific User-Agent to use for this session.
 	 */
-	public RetsSession(String loginUrl, RetsHttpClient httpClient, RetsVersion retsVersion, String userAgent, boolean strict) {
+	public RetsSession(String loginUrl,
+	                   RetsHttpClient httpClient,
+	                   RetsVersion retsVersion,
+	                   String userAgent,
+	                   boolean strict) {
+		final Properties properties = new Properties();
+		try {
+			properties.load(this.getClass().getClassLoader().getResourceAsStream("rets-client.properties"));
+			RetsSession.userAgent = properties.getProperty("user-agent") + "/" + properties.getProperty("version");
+		} catch (IOException e) {
+			// do nothing, use the default static value
+		}
+		if (Strings.isNullOrEmpty(userAgent)) {
+			userAgent = RetsSession.userAgent;
+		}
 		this.capabilityUrls = new CapabilityUrls();
 		this.capabilityUrls.setLoginUrl(loginUrl);
 
 		this.httpClient = httpClient;
+		this.httpClient.addDefaultHeader(USER_AGENT, userAgent);
 		this.transport = new RetsTransport(httpClient, this.capabilityUrls, retsVersion, strict);
-		this.httpClient.addDefaultHeader("User-Agent", userAgent);
 	}
 
 	/**
@@ -104,7 +119,7 @@ public class RetsSession {
 	 *                  objects created in the future.
 	 */
 	public static void setUserAgent(String userAgent) {
-		sUserAgent = userAgent;
+		RetsSession.userAgent = userAgent;
 	}
 
 	/**
