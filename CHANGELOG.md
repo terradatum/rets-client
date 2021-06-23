@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.2.3](https://github.com/terradatum/rets-client/compare/v1.2.2...v1.2.3) (2021-06-23)
+
+
+### Bug Fixes
+
+* **ci:** use the correct JDK for building ([97c1215](https://github.com/terradatum/rets-client/commit/97c121504844cfa9bb64b4b2b1a73fe945e5bcf8))
+* **user-agent:** ensure there is always a "User-Agent" header - previously allowed null ([9ff0317](https://github.com/terradatum/rets-client/commit/9ff03170775006acf5456b7814b0a883491d57b1))
+
 ### [1.2.2](https://github.com/terradatum/rets-client/compare/v1.2.1...v1.2.2) (2021-06-17)
 
 
