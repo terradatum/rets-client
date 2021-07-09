@@ -16,8 +16,7 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.client.SystemDefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -40,27 +39,23 @@ public class CommonsHttpClient extends RetsHttpClient {
 	private static final String RETS_UA_AUTH_HEADER = "RETS-UA-Authorization";
 	private static final String ACCEPT_ENCODING = "Accept-Encoding";
 	private final ConcurrentHashMap<String, String> defaultHeaders;
-	private final DefaultHttpClient httpClient;
+	private final SystemDefaultHttpClient httpClient;
 	// method choice improvement
 	private final String userAgentPassword;
 
 	public CommonsHttpClient() {
-		this(new DefaultHttpClient(
-				defaultConnectionManager(Integer.MAX_VALUE, Integer.MAX_VALUE),
-				defaultParams(DEFAULT_TIMEOUT, DEFAULT_COOKIE_POLICY)),
+		this(new SystemDefaultHttpClient(defaultParams(DEFAULT_TIMEOUT, DEFAULT_COOKIE_POLICY)),
 				null,
 				true);
 	}
 
 	public CommonsHttpClient(int timeout, String cookiePolicy, String userAgentPassword, boolean gzip) {
-		this(new DefaultHttpClient(
-				defaultConnectionManager(Integer.MAX_VALUE, Integer.MAX_VALUE),
-				defaultParams(timeout, cookiePolicy)),
+		this(new SystemDefaultHttpClient(defaultParams(timeout, cookiePolicy)),
 				userAgentPassword,
 				gzip);
 	}
 
-	public CommonsHttpClient(DefaultHttpClient client, String userAgentPassword, boolean gzip) {
+	public CommonsHttpClient(SystemDefaultHttpClient client, String userAgentPassword, boolean gzip) {
 		this.defaultHeaders = new ConcurrentHashMap<>();
 		this.userAgentPassword = userAgentPassword;
 
@@ -87,7 +82,7 @@ public class CommonsHttpClient extends RetsHttpClient {
 		return connectionManager;
 	}
 
-	public DefaultHttpClient getHttpClient() {
+	public SystemDefaultHttpClient getHttpClient() {
 		return this.httpClient;
 	}
 
