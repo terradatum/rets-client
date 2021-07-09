@@ -8,7 +8,7 @@ on:
       - '**/src/**'
       - '**/pom.xml'
       - '.github/maven/settings.xml'
-      - '.github/workflows/main.yml'
+      - '.github/workflows/push-build.yml'
       - 'prepare.sh'
       - 'publish.sh'
       - '.releaserc.json'
