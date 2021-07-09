@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/terradatum/rets-client/compare/v1.2.3...v1.3.0) (2021-07-09)
+
+
+### Features
+
+* use `SystemDefaultHttpClient` to support configuration via system properties ([012016f](https://github.com/terradatum/rets-client/commit/012016f09244b01dfd974e231fee056fac851cc1))
+
 ### [1.2.3](https://github.com/terradatum/rets-client/compare/v1.2.2...v1.2.3) (2021-06-23)
 
 
