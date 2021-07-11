@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/terradatum/rets-client/compare/v1.3.0...v1.4.0) (2021-07-11)
+
+
+### Features
+
+* finish support for configuration of HttpClient via System Properties ([82f880a](https://github.com/terradatum/rets-client/commit/82f880a3decff5cc7e9dcac51f3bbdc6c284710d))
+
 ## [1.3.0](https://github.com/terradatum/rets-client/compare/v1.2.3...v1.3.0) (2021-07-09)
 
 
