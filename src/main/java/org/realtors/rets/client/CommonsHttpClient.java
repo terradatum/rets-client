@@ -3,11 +3,9 @@ package org.realtors.rets.client;
 import com.google.common.base.Strings;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -16,6 +14,7 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.SystemDefaultCredentialsProvider;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -23,6 +22,8 @@ import org.apache.http.params.HttpConnectionParams;
 import org.realtors.rets.util.CaseInsensitiveTreeMap;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,6 +43,7 @@ public class CommonsHttpClient extends RetsHttpClient {
 	private final SystemDefaultHttpClient httpClient;
 	// method choice improvement
 	private final String userAgentPassword;
+	private Credentials creds;
 
 	public CommonsHttpClient() {
 		this(new SystemDefaultHttpClient(defaultParams(DEFAULT_TIMEOUT, DEFAULT_COOKIE_POLICY)),
@@ -58,6 +60,7 @@ public class CommonsHttpClient extends RetsHttpClient {
 	public CommonsHttpClient(SystemDefaultHttpClient client, String userAgentPassword, boolean gzip) {
 		this.defaultHeaders = new ConcurrentHashMap<>();
 		this.userAgentPassword = userAgentPassword;
+		client.setCredentialsProvider(new SystemDefaultCredentialsProvider());
 
 		this.httpClient = client;
 		// ask the server if we can use gzip
@@ -89,13 +92,19 @@ public class CommonsHttpClient extends RetsHttpClient {
 	//----------------------method implementations
 	@Override
 	public void setUserCredentials(String userName, String password) {
-		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(userName, password);
-		this.httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+		this.creds = new UsernamePasswordCredentials(userName, password);
 	}
 
 	@Override
 	public RetsHttpResponse doRequest(String httpMethod, RetsHttpRequest request) throws RetsException {
-		return "GET".equals(StringUtils.upperCase(httpMethod)) ? this.doGet(request) : this.doPost(request);
+		try {
+			this.httpClient.getCredentialsProvider().setCredentials(
+					new AuthScope(HttpHost.create(new URI(request.getUrl()).getHost())),
+					creds);
+			return "GET".equals(StringUtils.upperCase(httpMethod)) ? this.doGet(request) : this.doPost(request);
+		} catch (URISyntaxException e) {
+			throw new RetsException(e);
+		}
 	}
 
 	//----------------------method implementations
